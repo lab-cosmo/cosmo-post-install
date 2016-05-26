@@ -2,13 +2,13 @@
 
 dir="$(dirname "$0")"
 
-FAVS="$dir/data/favourites.list"
+FAVS="$dir/data/favourites-COSMO.list"
 
 # Install Favourite Applications
 function favourites {
     if (eval `resize` && whiptail \
-        --title "Favourite Applications" \
-        --yesno "Current list of favourite applications to install: \n\n$(cat $FAVS) \n\nProceed with installation?" \
+        --title "Default COSMO Applications" \
+        --yesno "Current list of applications to install: \n\n$(cat $FAVS) \n\nProceed with installation?" \
         $LINES $COLUMNS $(( $LINES - 12 )) \
         --scrolltext ) then
         show_info 'Installing...'

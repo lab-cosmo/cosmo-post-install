@@ -1,0 +1,11 @@
+auth-client-config
+ldap-auth-client
+ldap-auth-config
+libpam-ldap
+libnss-ldap
+ntp
+nfs-common
+autofs-ldap
+libpam-krb5
+krb5-user
+nfs4-acl-tools
