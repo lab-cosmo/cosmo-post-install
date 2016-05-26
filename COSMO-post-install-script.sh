@@ -72,7 +72,7 @@ function main {
     eval `resize`
     MAIN=$(whiptail \
         --notags \
-        --title "Ubuntu Post-Install Script" \
+        --title "COSMO Ubuntu Post-Install Script" \
         --menu "\nWhat would you like to do?" \
         --cancel-button "Quit" \
         $LINES $COLUMNS $(( $LINES - 12 )) \
