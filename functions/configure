@@ -72,7 +72,6 @@ function cosmonas {
 
     # Setup autofs
     show_info 'Setting up automount...'
-    show
     echo "/home auto.home --timeout 3600" | sudo tee -a /etc/auto.master
     echo "/- auto.cosmo --timeout 3600" | sudo tee -a /etc/auto.master
     # Creating map files
