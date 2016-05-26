@@ -11,7 +11,7 @@ You can get the latest version:
 
     git clone https://github.com/edoardob90/ubuntu-post-install.git
 
-**Remember:** the script has to be run after the OS installation through the users "local" (beacuse many parts need root permissions).
+**Remember:** the script has to be run after the OS installation through the user "local" created during installation (beacuse many parts need root permissions).
 
 ##Usage:
 
