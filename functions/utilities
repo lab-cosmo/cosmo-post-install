@@ -5,7 +5,7 @@ dir="$(dirname "$0")"
 UTILS="$dir/data/utilities.list"
 
 # Install Favourite System Utilities
-function utilities {
+function install_utils {
     if (eval `resize` && whiptail --title \
         "Favourite System Utilities"  --yesno \
         "Current list of favourite system utilities: \n\n$(cat $UTILS) \n\nProceed with installation?" \
@@ -19,6 +19,75 @@ function utilities {
         show_success 'Done.'
         whiptail --title "Finished" --msgbox "Installation complete." 8 78
         main
+    else
+        clear && main
+    fi
+}
+
+function texlive {
+    if (eval `resize` && whiptail --title \
+        "TeXLive installation" --yesno \
+        "This action will download & install the latest available version of TeXLive.\n\nProceed?" \
+        --scrolltext ) then
+    # Install
+    show_info "Installing..."
+    TMPDIR="${PWD}/texlive-install"
+    mkdir $TMPDIR
+    cd $TMPDIR
+    wget http://mirror.switch.ch/ftp/mirror/tex/systems/texlive/tlnet/install-tl-unx.tar.gz
+    tar xzf install-tl-unx.tar.gz
+    cd install-tl-*
+    show_info "Starting TeXLive installer..."
+    show_info "Choose a different directory if you don't want a system-wide installation."
+    show_warning 'Requires root privileges'
+    sudo ./install-tl \
+        -repository http://mirror.switch.ch/ftp/mirror/tex/systems/texlive/tlnet
+    cd - >/dev/null
+    show_info 'Setting up path for TeX bins...'
+    echo 'export PATH=/opt/texbin:${PATH}' > texlive.sh
+    sudo cp texlive.sh /etc/profile.d/
+    sudo mkdir -p /opt
+    case `uname -i` in
+        i386)
+            TEXPATH="/usr/local/texlive/2015/bin/i386"
+            ;;
+        x86_64)
+            TEXPATH="/usr/local/texlive/2015/bin/x86_64-linux"
+            ;;
+        *)
+            show_error "Error in architecture supported. Check it and re-run installation." && main
+            ;;
+    esac
+    sudo ln -s $TEXPATH/bin /opt/texbin
+    show_info 'TeX bin directory set. You should logout/login to make this change effective.'
+    show_info "Check that the command 'which tex' will give you '/opt/texbin'. If this is the case, enjoy TeXLive."
+    show_info 'Making TeX aware of system fonts...'
+    sudo cp $(kpsewhich -var-value TEXMFSYSVAR)/fonts/conf/texlive-fontconfig.conf \
+        /etc/fonts/conf.d/09-texlive.conf
+    sudo fc-cache -fsv
+    show_info 'Done.'
+    whiptail --title "Finished" --msgbox "TeXLive installation complete. Happy TeXing!" 8 78
+    main
+    else
+        clear && main
+    fi
+}
+
+function utilities {
+    eval `resize`
+    UTIL=$(whiptail \
+        --notags \
+        --title "Install utilities" \
+        --menu "\nWhat would you like to do?" \
+        --cancel-button "Go Back" \
+        $LINES $COLUMNS $(( $LINES -12 )) \
+        install_utils 'Install utilities packages' \
+        texlive 'Install latest TeXLive distribution' \
+        3>&1 1>&2 2>&3)
+
+    exitstatus=$?
+    if [[ $exitstatus == 0 ]]; then
+        clear && $UTIL
     else
         clear && main
     fi
