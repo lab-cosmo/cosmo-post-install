@@ -48,12 +48,18 @@ function texlive {
     echo 'export PATH=/opt/texbin:${PATH}' > texlive.sh
     sudo cp texlive.sh /etc/profile.d/
     sudo mkdir -p /opt
+    INSTALLDIR=$(whiptail --title "Where did you install TeXLive?" --nocancel --inputbox "Install directory:\n(leave default if you install in '/usr/local')" 8 80 "/usr/local" 3>&1 1>&2 2>&3)
+    exitstatus=$?
+    if [[ $exitstatus != 0 ]]; then
+        show_error 'Something went wrong when specifying TeXLive installation path.'
+        clear && main
+    fi
     case `uname -i` in
         i386)
-            TEXPATH="/usr/local/texlive/2015/bin/i386"
+            TEXPATH="$INSTALLDIR/texlive/2015/bin/i386"
             ;;
         x86_64)
-            TEXPATH="/usr/local/texlive/2015/bin/x86_64-linux"
+            TEXPATH="$INSTALLDIR/texlive/2015/bin/x86_64-linux"
             ;;
         *)
             show_error "Error in architecture supported. Check it and re-run installation." && main
