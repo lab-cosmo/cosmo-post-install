@@ -31,7 +31,8 @@ function texlive {
         --scrolltext ) then
     # Install
     show_info "Installing..."
-    TMPDIR="${PWD}/texlive-install"
+    WHERE=${PWD}
+    TMPDIR="$WHERE/texlive-install"
     mkdir $TMPDIR
     cd $TMPDIR
     wget http://mirror.switch.ch/ftp/mirror/tex/systems/texlive/tlnet/install-tl-unx.tar.gz
@@ -65,6 +66,7 @@ function texlive {
     sudo cp $(kpsewhich -var-value TEXMFSYSVAR)/fonts/conf/texlive-fontconfig.conf \
         /etc/fonts/conf.d/09-texlive.conf
     sudo fc-cache -fsv
+    cd $WHERE; rm -rf install-tl*
     show_info 'Done.'
     whiptail --title "Finished" --msgbox "TeXLive installation complete. Happy TeXing!" 8 78
     main
