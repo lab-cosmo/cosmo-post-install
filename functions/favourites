@@ -2,7 +2,7 @@
 
 dir="$(dirname "$0")"
 
-FAVS="$dir/data/favourites-COSMO.list"
+FAVS="$dir/data/favourites.list"
 
 # Install Favourite Applications
 function favourites {
