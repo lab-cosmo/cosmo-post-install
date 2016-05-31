@@ -17,4 +17,4 @@ You can get the latest version:
 
 Run from source folder:
 
-    ./COSMO-post-install-script.sh
+    ./cosmo-post-install-script.sh
