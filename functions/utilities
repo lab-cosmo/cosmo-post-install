@@ -27,13 +27,14 @@ function install_utils {
 function texlive {
     if (eval `resize` && whiptail --title \
         "TeXLive installation" --yesno \
-        "This action will download & install the latest available version of TeXLive.\n\nProceed?" \
+        "This action will download & install the latest available version of TeXLive.\n\nProceed with installation?" \
+        $LINES $COLUMNS $(( $LINES - 12 )) \
         --scrolltext ) then
     # Install
-    show_info "Installing..."
+    show_info "Preparing directories and dowloading TeX distribution..."
     WHERE=${PWD}
     TMPDIR="$WHERE/texlive-install"
-    mkdir $TMPDIR
+    mkdir -p $TMPDIR
     cd $TMPDIR
     wget http://mirror.switch.ch/ftp/mirror/tex/systems/texlive/tlnet/install-tl-unx.tar.gz
     tar xzf install-tl-unx.tar.gz
@@ -41,8 +42,7 @@ function texlive {
     show_info "Starting TeXLive installer..."
     show_info "Choose a different directory if you don't want a system-wide installation."
     show_warning 'Requires root privileges'
-    sudo ./install-tl \
-        -repository http://mirror.switch.ch/ftp/mirror/tex/systems/texlive/tlnet
+    sudo ./install-tl -repository http://mirror.switch.ch/ftp/mirror/tex/systems/texlive/tlnet
     cd - >/dev/null
     show_info 'Setting up path for TeX bins...'
     echo 'export PATH=/opt/texbin:${PATH}' > texlive.sh
@@ -66,7 +66,7 @@ function texlive {
             ;;
     esac
     sudo ln -s $TEXPATH/bin /opt/texbin
-    show_info 'TeX bin directory set. You should logout/login to make this change effective.'
+    show_info 'TeX bin directory set. You MUST logout/login to make this change effective.'
     show_info "Check that the command 'which tex' will give you '/opt/texbin'. If this is the case, enjoy TeXLive."
     show_info 'Making TeX aware of system fonts...'
     sudo cp $(kpsewhich -var-value TEXMFSYSVAR)/fonts/conf/texlive-fontconfig.conf \
