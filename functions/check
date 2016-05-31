@@ -36,3 +36,12 @@ function check {
     fi
     done
 }
+
+
+function check_exit {
+    EXITSTATUS=$1
+    if [[ $EXITSTATUS != 0 ]]; then
+        show_error "Last command returned an exit status of $EXITSTATUS. Something went wrong (probably 'sudo' privileges). Aborting."
+        sleep 5 && clear && exit 99
+    fi
+}
