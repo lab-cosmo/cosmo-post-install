@@ -9,7 +9,7 @@ Feel free to copy, improve and distribute.
 
 You can get the latest version:
 
-    git clone https://github.com/edoardob90/ubuntu-post-install.git
+    git clone https://github.com/edoardob90/cosmo-post-install.git
 
 **Remember:** the script has to be run after the OS installation by the user "local" created during installation (because many parts need root permissions).
 
