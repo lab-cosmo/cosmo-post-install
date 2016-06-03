@@ -48,6 +48,7 @@ function cosmonas {
     if (eval `resize` && whiptail --title \
         "Setup of shared home on COSMO NAS" --yesno \
         "List of applications needed for this operation: \n\n$(cat $COSMOUTILS) \n\nProceed?" \
+        $LINES $COLUMNS $(( $LINES - 12 )) \
         --scrolltext ) then
     show_info 'Installing... This will trigger an interactive setup of LDAP and Kerberos.'
     show_warning 'Requires root privileges'
