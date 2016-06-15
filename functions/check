@@ -51,9 +51,15 @@ function check_exit {
 }
 
 function check_sudo {
-    EXITSTATUS=$(groups $USER | grep 'sudo'; echo $?)
-    if [[ $EXITSTATUS != 0 ]]; then
-        show_error "User invoking this script is not allowed to use 'sudo'. Log in as root or as user with admin privileges."
-        sleep 5 && clear && exit 99
+    if [[ $EUID != 0 ]]; then
+        show_warning "You are not log in as root. Checking if current user can use 'sudo'..."
+        EXITSTATUS=$(groups $USER | grep 'sudo'; echo $?)
+        if [[ $EXITSTATUS != 0 ]]; then
+            show_error "User invoking this script is not allowed to use 'sudo'. Log in as root or as user with admin privileges."
+            sleep 5 && clear && exit 99
+        fi
+    else
+        show_success "You are root, no problems then. Going on..."
+        sleep 3
     fi
 }
