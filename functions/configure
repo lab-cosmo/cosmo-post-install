@@ -69,13 +69,16 @@ function cosmonas {
     # File '/etc/idmapd.conf'
     show_info 'File "idmapd.conf"'
     echo -e "Domain = INTRANET\nLocal-Realms = epfl@INTRANET,epfl,epfl.ch\n" | $SUDOCMD tee -a /etc/idmapd.conf
-    
     # File '/etc/nslcd.conf'
     show_info 'Configure nscd daemon'
     echo "ssl start_tls" | $SUDOCMD tee -a /etc/nslcd.conf
-
+    $SUDOCMD service nscd restart
+    # Configuring PAM to restrict logins
+    show_info 'Configuring PAM to restrict logins'
+    echo "auth    required            pam_access.so" | $SUDOCMD tee -a /etc/pam.d/common-auth
+    echo "-:ALL EXCEPT root (cosmo) tocci cliang:ALL EXCEPT LOCAL" | $SUDOCMD tee -a /etc/security/access.conf
     # Done with LDAP
-    show_success 'Done.'
+    show_success 'Done with LDAP!'
 
     # Setup autofs
     show_info 'Setting up automount...'
