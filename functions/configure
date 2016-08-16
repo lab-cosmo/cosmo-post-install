@@ -25,7 +25,7 @@ function preferences {
 function startup {
     show_info 'Changing display of startup applications...'
     show_warning 'Requires root privileges'
-    sudo sed -i "s/NoDisplay=true/NoDisplay=false/g" /etc/xdg/autostart/*.desktop
+    $SUDOCMD sed -i "s/NoDisplay=true/NoDisplay=false/g" /etc/xdg/autostart/*.desktop
     # Done
     show_success 'Done.'
     whiptail --title "Finished" --msgbox "Settings changed successfully." 8 78
@@ -36,7 +36,7 @@ function startup {
 function apport {
     show_info 'Disabling apport crash dialogs...'
     show_warning 'Requires root privileges'
-    sudo sed -i "s/enabled=1/enabled=0/g" /etc/default/apport
+    $SUDOCMD sed -i "s/enabled=1/enabled=0/g" /etc/default/apport
     # Done
     show_success 'Done.'
     whiptail --title "Finished" --msgbox "Settings changed successfully." 8 78
@@ -46,49 +46,55 @@ function apport {
 # Setup shared home on the COSMO nas
 function cosmonas {
     if (eval `resize` && whiptail --title \
-        "Setup of shared home on COSMO NAS" --yesno \
+        "Setup of remote HOMES and LDAP authentication" --yesno \
         "List of applications needed for this operation: \n\n$(cat $COSMOUTILS) \n\nProceed?" \
         $LINES $COLUMNS $(( $LINES - 12 )) \
         --scrolltext ) then
     show_info 'Installing... This will trigger an interactive setup of LDAP and Kerberos.'
     show_warning 'Requires root privileges'
-    sudo apt-get install -y --no-install-recommends $(cat $COSMOUTILS)
+    $SUDOCMD apt-get install -y --no-install-recommends $(cat $COSMOUTILS)
     show_success 'Installation done.'
-    show_info 'Setting up config files...'
+    show_info 'Setting up LDAP auth files...'
     show_warning 'Requires root privileges'
     # File '/etc/ntp.conf'
     show_info 'File "ntp.conf"'
-    echo "server 128.178.23.1" | sudo tee -a /etc/ntp.conf
+    echo "server 128.178.23.1" | $SUDOCMD tee -a /etc/ntp.conf
     # File '/etc/ldap.conf'
     show_info 'File "ldap.conf"'
-    echo -e " bind_policy soft \n nss_initgroups backlink \n" | sudo tee -a /etc/ldap.conf
+    echo -e " bind_policy soft\n nss_initgroups backlink\n" | $SUDOCMD tee -a /etc/ldap.conf
     # File '/etc/nsswitch.conf'
     show_info 'File "nsswitch.conf"'
-    sudo sed -i 's/\(compat\)/ldap \1/' /etc/nsswitch.conf
-    echo -e "automount:  files\n" | sudo tee -a /etc/nsswitch.conf
+    $SUDOCMD sed -i 's/\(compat\)/ldap \1/' /etc/nsswitch.conf
+    echo -e "automount:  files\n" | $SUDOCMD tee -a /etc/nsswitch.conf
     # File '/etc/idmapd.conf'
     show_info 'File "idmapd.conf"'
-    echo -e "Domain = INTRANET\nLocal-Realms = epfl@INTRANET,epfl,epfl.ch\n" | sudo tee -a /etc/idmapd.conf
+    echo -e "Domain = INTRANET\nLocal-Realms = epfl@INTRANET,epfl,epfl.ch\n" | $SUDOCMD tee -a /etc/idmapd.conf
+    
+    # File '/etc/nslcd.conf'
+    show_info 'Configure nscd daemon'
+    echo "ssl start_tls" | $SUDOCMD tee -a /etc/nslcd.conf
+
+    # Done with LDAP
     show_success 'Done.'
 
     # Setup autofs
     show_info 'Setting up automount...'
-    echo "/home auto.home --timeout 3600" | sudo tee -a /etc/auto.master
-    echo "/- auto.cosmo --timeout 3600" | sudo tee -a /etc/auto.master
+    echo "/home auto.home --timeout 3600" | $SUDOCMD tee -a /etc/auto.master
+    echo "/- auto.cosmo --timeout 3600" | $SUDOCMD tee -a /etc/auto.master
     # Creating map files
     show_info 'Creating map files "auto.home" and "auto.cosmo"'
-    echo "* -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-homes/&" | sudo tee /etc/auto.home
-    echo "/apps -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft  cosmonas1.epfl.ch:/volume1/cosmo-apps" | sudo tee /etc/auto.cosmo
-    echo "/workspace -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft  cosmonas1.epfl.ch:/volume1/workspace" | sudo tee -a /etc/auto.cosmo
+    echo "* -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-homes/&" | $SUDOCMD tee /etc/auto.home
+    echo "/apps -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft  cosmonas1.epfl.ch:/volume1/cosmo-apps" | $SUDOCMD tee /etc/auto.cosmo
+    echo "/workspace -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft  cosmonas1.epfl.ch:/volume1/workspace" | $SUDOCMD tee -a /etc/auto.cosmo
     show_success 'Done. Autofs will start on next reboot.'
     # Permissions on scratch and local home
     show_info 'Changing permissions to local scratch folder and home'
     if [[ -d "/local/scratch" ]]; then
-        sudo chgrp cosmo /local/scratch
-        sudo chmod 775 /local/scratch
+        $SUDOCMD chgrp cosmo /local/scratch
+        $SUDOCMD chmod 775 /local/scratch
     fi
     if [[ -d "/local/home" ]]; then
-        sudo chgrp cosmo /local/home
+        $SUDOCMD chgrp cosmo /local/home
     fi
     show_success 'Configuration done.'
     whiptail --title "Finished" --msgbox "Configuration complete." 8 78
@@ -106,7 +112,7 @@ function configure {
         --menu "\nWhat would you like to do?" \
         --cancel-button "Go Back" \
         $LINES $COLUMNS $(( $LINES - 12 )) \
-        cosmonas    'Setup shared home on COSMO nas' \
+        cosmonas    'Setup remote HOMES and LDAP authentication' \
         preferences 'Set preferred application-specific settings' \
         apport      'Disable system crash dialogs' \
         startup     'Show all startup applications' \

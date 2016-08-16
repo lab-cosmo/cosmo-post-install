@@ -82,7 +82,7 @@ function main {
         development 'Install development tools' \
         codecs      'Install Ubuntu Restricted Extras' \
         thirdparty  'Install third-party applications' \
-        configure   'Configure system (including shared home on COSMO NAS)' \
+        configure   'Configure system (including remote HOMES and LDAP authentication)' \
         cleanup     'Cleanup the system' \
         3>&1 1>&2 2>&3)
      

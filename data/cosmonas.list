@@ -3,6 +3,11 @@ ldap-auth-client
 ldap-auth-config
 libpam-ldap
 libnss-ldap
+nss-updatedb
+libnss-db
+nscd
+nslcd
+ldap-utils
 ntp
 nfs-common
 autofs-ldap

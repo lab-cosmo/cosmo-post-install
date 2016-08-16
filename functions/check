@@ -58,8 +58,13 @@ function check_sudo {
             show_error "User invoking this script is not allowed to use 'sudo'. Log in as root or as user with admin privileges."
             sleep 5 && clear && exit 99
         fi
+        # Curren user can use 'sudo'
+        show_success "Current user can use sudo command! Going on..."
+        sleep 2
+        SUDOCMD="sudo"
     else
         show_success "You are root, no problems then. Going on..."
-        sleep 3
+        SUDOCMD=""
+        sleep 2
     fi
 }
