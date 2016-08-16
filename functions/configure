@@ -64,7 +64,7 @@ function cosmonas {
     echo -e " bind_policy soft\n nss_initgroups backlink\n" | $SUDOCMD tee -a /etc/ldap.conf
     # File '/etc/nsswitch.conf'
     show_info 'File "nsswitch.conf"'
-    $SUDOCMD sed -i 's/\(compat\)/ldap \1/' /etc/nsswitch.conf
+    $SUDOCMD sed -i 's/\(compat\)/\1 ldap/' /etc/nsswitch.conf
     echo -e "automount:  files\n" | $SUDOCMD tee -a /etc/nsswitch.conf
     # File '/etc/idmapd.conf'
     show_info 'File "idmapd.conf"'
@@ -77,8 +77,11 @@ function cosmonas {
     show_info 'Configuring PAM to restrict logins'
     echo "auth    required            pam_access.so" | $SUDOCMD tee -a /etc/pam.d/common-auth
     echo "-:ALL EXCEPT root (cosmo) tocci cliang:ALL EXCEPT LOCAL" | $SUDOCMD tee -a /etc/security/access.conf
+    # Enabling login from other users
+    show_info 'Enabling login from other users'
+    echo -e "[SeatDefaults]\ngreeter-show-manual-login=true\ngreeter-hide-users=true" | $SUDOCMD tee /etc/lightdm/lightdm.conf
     # Done with LDAP
-    show_success 'Done with LDAP!'
+    show_success 'Done with LDAP.'
 
     # Setup autofs
     show_info 'Setting up automount...'
