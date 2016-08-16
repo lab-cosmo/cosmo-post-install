@@ -64,7 +64,7 @@ function cosmonas {
     echo -e " bind_policy soft \n nss_initgroups backlink \n" | sudo tee -a /etc/ldap.conf
     # File '/etc/nsswitch.conf'
     show_info 'File "nsswitch.conf"'
-    sudo sed -i 's/\(compat\)/\1 ldap/' /etc/nsswitch.conf
+    sudo sed -i 's/\(compat\)/ldap \1/' /etc/nsswitch.conf
     echo -e "automount:  files\n" | sudo tee -a /etc/nsswitch.conf
     # File '/etc/idmapd.conf'
     show_info 'File "idmapd.conf"'
