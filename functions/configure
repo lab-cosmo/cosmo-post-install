@@ -73,10 +73,6 @@ function cosmonas {
     show_info 'Configure nscd daemon'
     echo "ssl start_tls" | $SUDOCMD tee -a /etc/nslcd.conf
     $SUDOCMD service nscd restart
-    # Configuring PAM to restrict logins
-    show_info 'Configuring PAM to restrict logins'
-    echo "auth    required            pam_access.so" | $SUDOCMD tee -a /etc/pam.d/common-auth
-    echo "-:ALL EXCEPT root (cosmo) tocci cliang:ALL EXCEPT LOCAL" | $SUDOCMD tee -a /etc/security/access.conf
     # Enabling login from other users
     show_info 'Enabling login from other users'
     echo -e "[SeatDefaults]\ngreeter-show-manual-login=true\ngreeter-hide-users=true" | $SUDOCMD tee /etc/lightdm/lightdm.conf
@@ -104,9 +100,24 @@ function cosmonas {
     fi
     show_success 'Configuration done.'
     whiptail --title "Finished" --msgbox "Configuration complete." 8 78
+    configure
     else
         clear && main
     fi
+}
+
+# Security fixes
+function security {
+    show_info 'Security fix: disabling LDAP "admin" group to gain root privileges'
+    $SUDOCMD sed -i 's/\(^%admin.*\)/#\1/' /etc/sudoers
+    show_success 'Done!' && sleep 2
+    # Configuring PAM to restrict logins
+    show_info 'Configuring PAM to restrict logins (root allowed only locally, denied through SSH)'
+    echo "auth required pam_access.so" | $SUDOCMD tee -a /etc/pam.d/common-auth
+    echo -e "-:root:ALL EXCEPT LOCAL\n-:ALL EXCEPT (cosmo) tocci cliang:ALL" | $SUDOCMD tee -a /etc/security/access.conf
+    show_success 'PAM configured!' && sleep 2
+    whiptail --title "Finished" --msgbox "Settings changed successfully." 8 78
+    configure
 }
 
 # Configure System
@@ -119,6 +130,7 @@ function configure {
         --cancel-button "Go Back" \
         $LINES $COLUMNS $(( $LINES - 12 )) \
         cosmonas    'Setup remote HOMES and LDAP authentication' \
+        security    'Security fixes: (1) LDAP admin group (2) SSH root login' \
         preferences 'Set preferred application-specific settings' \
         apport      'Disable system crash dialogs' \
         startup     'Show all startup applications' \
