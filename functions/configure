@@ -60,18 +60,20 @@ function cosmonas {
     show_info 'File "ntp.conf"'
     echo "server 128.178.23.1" | $SUDOCMD tee -a /etc/ntp.conf
     # File '/etc/ldap.conf'
-    show_info 'File "ldap.conf"'
-    echo -e " bind_policy soft\n nss_initgroups backlink\n" | $SUDOCMD tee -a /etc/ldap.conf
+    show_info 'Configuring file "ldap.conf"'
+    echo -e "timelimit 30\nbind_timelimit 30\nbind_policy soft\n nss_initgroups backlink\nnss_map_attribute uniqueMember memberUid\n" | $SUDOCMD tee -a /etc/ldap.conf
+    IGNORE=`awk -F: '{printf ("%s,",$1)}' /etc/passwd`
+    echo "nss_initgroups_ignoreusers ${IGNORE%,}" | $SUDOCMD tee -a /etc/ldap.conf
     # File '/etc/nsswitch.conf'
     show_info 'File "nsswitch.conf"'
-    $SUDOCMD sed -i 's/\(compat\)/\1 ldap/' /etc/nsswitch.conf
-    echo -e "automount:  files\n" | $SUDOCMD tee -a /etc/nsswitch.conf
+    $SUDOCMD sed -i 's/compat/files ldap [NOTFOUND=return] db/' /etc/nsswitch.conf
+    echo -e "automount: files\n" | $SUDOCMD tee -a /etc/nsswitch.conf
     # File '/etc/idmapd.conf'
     show_info 'File "idmapd.conf"'
     echo -e "Domain = INTRANET\nLocal-Realms = epfl@INTRANET,epfl,epfl.ch\n" | $SUDOCMD tee -a /etc/idmapd.conf
     # File '/etc/nslcd.conf'
     show_info 'Configure nscd daemon'
-    echo "ssl start_tls" | $SUDOCMD tee -a /etc/nslcd.conf
+    echo -e "bind_timelimit 30\ntimelimit 30" | $SUDOCMD tee -a /etc/nslcd.conf
     $SUDOCMD service nscd restart
     # Enabling login from other users
     show_info 'Enabling login from other users'
