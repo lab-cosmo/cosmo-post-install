@@ -6,6 +6,11 @@ DEPS="$dir/data/dependencies.list"
 
 # Dependency Check
 function check {
+    # Now checking sudo privileges
+    show_info "Checking if user can run command as superuser..."
+    check_sudo
+    
+    # Checking main dependecies
     show_info "Checking dependencies..."
     for package in $(cat $DEPS)
     do 
@@ -35,10 +40,6 @@ function check {
         show_info "'$package' is installed. Proceeding"
     fi
     done
-
-    # Now checking sudo privileges
-    show_info "Checking if user can run command as superuser..."
-    check_sudo
 }
 
 
@@ -60,8 +61,8 @@ function check_sudo {
         fi
         # Curren user can use 'sudo'
         show_success "Current user can use sudo command! Going on..."
-        sleep 2
         SUDOCMD="sudo"
+        sleep 2
     else
         show_success "You are root, no problems then. Going on..."
         SUDOCMD=""

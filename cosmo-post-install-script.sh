@@ -10,7 +10,7 @@
 #
 # Description:
 #   A post-installation bash script for Ubuntu
-#   with a few modifications for settin up a COSMO workstation
+#   with a few modifications for setting up a COSMO workstation
 #
 # Legal Preamble:
 #
