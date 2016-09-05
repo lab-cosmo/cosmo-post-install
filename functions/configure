@@ -87,10 +87,13 @@ function cosmonas {
     echo "/- auto.cosmo --timeout 3600" | $SUDOCMD tee -a /etc/auto.master
     # Creating map files
     show_info 'Creating map files for home folders and COSMO workspaces'
-    echo "* -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-homes/&" | $SUDOCMD tee /etc/auto.home
     echo "/apps -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-apps" | $SUDOCMD tee /etc/auto.cosmo
-    echo "/workspace -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/workspace" | $SUDOCMD tee -a /etc/auto.cosmo
+    echo "* -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/cosmo-homes/&" | $SUDOCMD tee /etc/auto.home
+    #echo "* -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-homes/&" | $SUDOCMD tee /etc/auto.home
+    echo "/workspace -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/workspace" | $SUDOCMD tee -a /etc/auto.cosmo
+    #echo "/workspace -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/workspace" | $SUDOCMD tee -a /etc/auto.cosmo
     show_success 'Done. Autofs will start on next reboot.'
+    
     # Permissions on scratch and local home
     show_info 'Changing permissions to local scratch folder and home'
     if [[ -d "/local/scratch" ]]; then
