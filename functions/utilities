@@ -36,22 +36,35 @@ function texlive {
     TMPDIR="$WHERE/texlive-install"
     mkdir -p $TMPDIR
     cd $TMPDIR
-    wget http://mirror.switch.ch/ftp/mirror/tex/systems/texlive/tlnet/install-tl-unx.tar.gz
-    tar xzf install-tl-unx.tar.gz
+    wget -O texlive.tar.gz http://mirror.switch.ch/ftp/mirror/tex/systems/texlive/tlnet/install-tl-unx.tar.gz
+    tar xzf texlive.tar.gz; rm -f texlive.tar.gz
     cd install-tl-*
     show_info "Starting TeXLive installer..."
     show_info "Choose a different directory if you don't want a system-wide installation."
     show_warning 'Requires root privileges'
     sudo ./install-tl -repository http://mirror.switch.ch/ftp/mirror/tex/systems/texlive/tlnet
+    exitstatus=$?
+    if [[ $exitstatus != 0 ]]; then
+        show_error 'Something went wrong with TeXLive installation! Exit and reinstall again.'
+        clear && main
+    else
+        show_info 'TeXLive installation went fine! Now configuring binaries and paths ...'
+    fi
     cd - >/dev/null
     show_info 'Setting up path for TeX bins...'
     echo 'export PATH=/opt/texbin:${PATH}' > texlive.sh
-    sudo cp texlive.sh /etc/profile.d/
+    sudo mv texlive.sh /etc/profile.d/
     sudo mkdir -p /opt
-    INSTALLDIR=$(whiptail --title "Where did you install TeXLive?" --nocancel --inputbox "Install directory:\n(leave default if you install in '/usr/local')" 8 80 "/usr/local" 3>&1 1>&2 2>&3)
+    YEAR=$(whiptail --title "Year of TeXLive distribution installed?" --nocancel --inputbox "Year:\n" 8 80 "2015" 3>&1 1>&2 2>&3)
+    exitstatus=$?
+    if [[ $exitstatus != 0 || ${#YEAR} > 4 ]]; then
+        show_error 'You specified a wrong year (perhaps badly formatted; only 4 digits are needed)'
+        clear && main
+    fi
+    INSTALLDIR=$(whiptail --title "Where did you install TeXLive?" --nocancel --inputbox "Install directory:\n(leave default if you installed in '/usr/local')" 8 80 "/usr/local" 3>&1 1>&2 2>&3)
     exitstatus=$?
     if [[ $exitstatus != 0 ]]; then
-        show_error 'Something went wrong when specifying TeXLive installation path.'
+        show_error 'Something went wrong when specifying TeXLive installation path.' && sleep 2
         clear && main
     fi
     case `uname -i` in
@@ -66,13 +79,13 @@ function texlive {
             ;;
     esac
     sudo ln -s $TEXPATH/bin /opt/texbin
-    show_info 'TeX bin directory set. You MUST logout/login to make this change effective.'
-    show_info "Check that the command 'which tex' will give you '/opt/texbin'. If this is the case, enjoy TeXLive."
+    show_info 'TeX bin directory set. You MUST logout/login to make this change effective.' && sleep 2
+    show_info "Check that the command 'which tex' will give you '/opt/texbin'. If this is the case, enjoy TeXLive." && sleep 2
     show_info 'Making TeX aware of system fonts...'
     sudo cp $(kpsewhich -var-value TEXMFSYSVAR)/fonts/conf/texlive-fontconfig.conf \
         /etc/fonts/conf.d/09-texlive.conf
     sudo fc-cache -fsv
-    cd $WHERE; rm -rf install-tl*
+    cd $WHERE; rm -rf texlive-install
     show_info 'Done.'
     whiptail --title "Finished" --msgbox "TeXLive installation complete. Happy TeXing!" 8 78
     main
