@@ -119,7 +119,7 @@ function security {
     # Configuring PAM to restrict logins
     show_info 'Configuring PAM to restrict logins (root allowed only locally, denied through SSH)'
     echo "auth required pam_access.so" | $SUDOCMD tee -a /etc/pam.d/common-auth
-    echo -e "+:local:LOCAL\n-:root:ALL EXCEPT LOCAL\n-:ALL EXCEPT (cosmo) tocci cliang:ALL" | $SUDOCMD tee -a /etc/security/access.conf
+    echo -e "+:local:LOCAL\n-:root:ALL EXCEPT LOCAL\n-:ALL EXCEPT (COSMO-UNIT):ALL" | $SUDOCMD tee -a /etc/security/access.conf
     show_success 'PAM configured!' && sleep 2
     whiptail --title "Finished" --msgbox "Settings changed successfully." 8 78
     configure
