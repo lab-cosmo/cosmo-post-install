@@ -14,7 +14,7 @@ function install_utils {
         show_info 'Installing...'
         show_warning 'Requires root privileges'
         # Feel free to change the contents of 'utilities.list' in the data folder to whatever suits your preference.
-        sudo apt-get install -y --no-install-recommends $(cat $UTILS)
+        $SUDOCMD apt-get install -y --no-install-recommends $(cat $UTILS)
         # Done
         show_success 'Done.'
         whiptail --title "Finished" --msgbox "Installation complete." 8 78
@@ -42,7 +42,7 @@ function texlive {
     show_info "Starting TeXLive installer..."
     show_info "Choose a different directory if you don't want a system-wide installation."
     show_warning 'Requires root privileges'
-    sudo ./install-tl -repository http://mirror.switch.ch/ftp/mirror/tex/systems/texlive/tlnet
+    $SUDOCMD ./install-tl -repository http://mirror.switch.ch/ftp/mirror/tex/systems/texlive/tlnet
     exitstatus=$?
     if [[ $exitstatus != 0 ]]; then
         show_error 'Something went wrong with TeXLive installation! Exit and reinstall again.'
@@ -53,8 +53,8 @@ function texlive {
     cd - >/dev/null
     show_info 'Setting up path for TeX bins...'
     echo 'export PATH=/opt/texbin:${PATH}' > texlive.sh
-    sudo mv texlive.sh /etc/profile.d/
-    sudo mkdir -p /opt
+    $SUDOCMD mv texlive.sh /etc/profile.d/
+    $SUDOCMD mkdir -p /opt
     YEAR=$(whiptail --title "Year of TeXLive distribution installed?" --nocancel --inputbox "Year:\n" 8 80 "2015" 3>&1 1>&2 2>&3)
     exitstatus=$?
     if [[ $exitstatus != 0 || ${#YEAR} > 4 ]]; then
@@ -78,13 +78,13 @@ function texlive {
             show_error "Error in architecture supported. Check it and re-run installation." && main
             ;;
     esac
-    sudo ln -s $TEXPATH/bin /opt/texbin
+    $SUDOCMD ln -fs $TEXPATH/bin /opt/texbin
     show_info 'TeX bin directory set. You MUST logout/login to make this change effective.' && sleep 2
     show_info "Check that the command 'which tex' will give you '/opt/texbin'. If this is the case, enjoy TeXLive." && sleep 2
     show_info 'Making TeX aware of system fonts...'
-    sudo cp $(kpsewhich -var-value TEXMFSYSVAR)/fonts/conf/texlive-fontconfig.conf \
+    $SUDOCMD cp $(kpsewhich -var-value TEXMFSYSVAR)/fonts/conf/texlive-fontconfig.conf \
         /etc/fonts/conf.d/09-texlive.conf
-    sudo fc-cache -fsv
+    $SUDOCMD fc-cache -fsv
     cd $WHERE; rm -rf texlive-install
     show_info 'Done.'
     whiptail --title "Finished" --msgbox "TeXLive installation complete. Happy TeXing!" 8 78
