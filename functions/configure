@@ -123,7 +123,7 @@ function security {
         show_info 'File "access.conf" already modified. Please check that restrictions there are correct!' && sleep 1
     else
         show_info 'Adding restrictions to "access.conf": root can access only locally, access for everyone not belonging to COSMO denied'
-        $SUDOCMD echo -e "-:root:ALL EXCEPT LOCAL\n+:local:LOCAL\n-:ALL EXCEPT (COSMO-unit):ALL" >> /etc/security/access.conf
+        echo -e "-:root:ALL EXCEPT LOCAL\n+:local:LOCAL\n-:ALL EXCEPT (COSMO-unit):ALL" | $SUDOCMD tee -a /etc/security/access.conf
     fi
     show_success 'PAM configured!' && sleep 1
     whiptail --title "Finished" --msgbox "Settings changed successfully." 8 78

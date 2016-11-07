@@ -64,8 +64,8 @@ function check_sudo {
         SUDOCMD="sudo"
         sleep 2
     else
-        show_success "You are root, no problems then. Going on..."
-        SUDOCMD=""
+        show_success "You are root, no problems. Going on..."
+        SUDOCMD=
         sleep 2
     fi
 }
