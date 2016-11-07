@@ -113,14 +113,14 @@ function cosmonas {
 
 # Security fixes
 function security {
-    show_info 'Security fix: disabling LDAP "admin" group to gain root privileges'
-    $SUDOCMD sed -i 's/\(^%admin.*\)/#\1/' /etc/sudoers
-    show_success 'Done!' && sleep 2
+    show_info 'Security fix: disabling LDAP "admin" group to gain root privileges through sudo'
+    $SUDOCMD sed -i 's:^\(%admin.*\):#\1:' /etc/sudoers
+    show_success 'Done!' && sleep 1
     # Configuring PAM to restrict logins
-    show_info 'Configuring PAM to restrict logins (root allowed only locally, denied through SSH)'
-    echo "auth required pam_access.so" | $SUDOCMD tee -a /etc/pam.d/common-auth
-    echo -e "+:local:LOCAL\n-:root:ALL EXCEPT LOCAL\n-:ALL EXCEPT (COSMO-UNIT):ALL" | $SUDOCMD tee -a /etc/security/access.conf
-    show_success 'PAM configured!' && sleep 2
+    show_info 'Configuring PAM to restrict logins (root will be allowed only locally, denied through SSH)'
+    $SUDOCMD sed -i 's:^#\(account.*pam_access.so$\):\1:' /etc/pam.d/login /etc/pam.d/sshd
+    echo -e "-:root:ALL EXCEPT LOCAL\n+:local:LOCAL\n-:ALL EXCEPT (COSMO-unit):ALL" | $SUDOCMD tee -a /etc/security/access.conf
+    show_success 'PAM configured!' && sleep 1
     whiptail --title "Finished" --msgbox "Settings changed successfully." 8 78
     configure
 }
