@@ -50,75 +50,75 @@ function cosmonas {
         "List of applications needed for this operation: \n\n$(cat $COSMOUTILS) \n\nProceed?" \
         $LINES $COLUMNS $(( $LINES - 12 )) \
         --scrolltext ) then
-    show_info 'Installing... This will trigger an interactive setup of LDAP and Kerberos.'
-    show_warning 'Requires root privileges'
-    $SUDOCMD apt-get install -y --no-install-recommends $(cat $COSMOUTILS)
-    show_success 'Installation done.'
-    show_info 'Setting up LDAP auth files...'
-    show_warning 'Requires root privileges'
-    # File '/etc/ntp.conf'
-    show_info 'File "ntp.conf"'
-    echo "server 128.178.23.1" | $SUDOCMD tee -a /etc/ntp.conf
-    # File '/etc/ldap.conf'
-    show_info 'Configuring file "ldap.conf"'
-    echo -e "timelimit 30\nbind_timelimit 30\nidle_timelimit 1200\nbind_policy soft\n nss_initgroups backlink\nnss_map_attribute uniqueMember memberUid\n" | $SUDOCMD tee -a /etc/ldap.conf
-    IGNORE=`awk -F: '{printf ("%s,",$1)}' /etc/passwd`
-    echo "nss_initgroups_ignoreusers ${IGNORE%,}" | $SUDOCMD tee -a /etc/ldap.conf
-    # File '/etc/nsswitch.conf'
-    show_info 'File "nsswitch.conf"'
-    $SUDOCMD sed -i 's/compat/files ldap/' /etc/nsswitch.conf
-    echo -e "automount: files\n" | $SUDOCMD tee -a /etc/nsswitch.conf
-    # File '/etc/idmapd.conf'
-    show_info 'File "idmapd.conf"'
-    echo -e "Domain = INTRANET\nLocal-Realms = epfl@INTRANET,epfl,epfl.ch\n" | $SUDOCMD tee -a /etc/idmapd.conf
-    # File '/etc/nslcd.conf'
-    show_info 'Configure nscd daemon'
-    echo -e "bind_timelimit 30\ntimelimit 30\nidle_timelimit 1200" | $SUDOCMD tee -a /etc/nslcd.conf
-    $SUDOCMD service nscd restart
-    # Enabling login from other users
-    show_info 'Enabling login from other users'
-    echo -e "[SeatDefaults]\ngreeter-show-manual-login=true\ngreeter-hide-users=true" | $SUDOCMD tee /etc/lightdm/lightdm.conf
-    # Done with LDAP
-    show_success 'Done with LDAP.'
+            show_info 'Installing... This will trigger an interactive setup of LDAP and Kerberos.'
+            show_warning 'Requires root privileges'
+            $SUDOCMD apt-get install -y --no-install-recommends $(cat $COSMOUTILS)
+            show_success 'Installation done.'
+            show_info 'Setting up LDAP auth files...'
+            show_warning 'Requires root privileges'
+            # File '/etc/ntp.conf'
+            show_info 'File "ntp.conf"'
+            echo "server 128.178.23.1" | $SUDOCMD tee -a /etc/ntp.conf
+            # File '/etc/ldap.conf'
+            show_info 'Configuring file "ldap.conf"'
+            echo -e "timelimit 30\nbind_timelimit 30\nidle_timelimit 1200\nbind_policy soft\n nss_initgroups backlink\nnss_map_attribute uniqueMember memberUid\n" | $SUDOCMD tee -a /etc/ldap.conf
+            IGNORE=`awk -F: '{printf ("%s,",$1)}' /etc/passwd`
+            echo "nss_initgroups_ignoreusers ${IGNORE%,}" | $SUDOCMD tee -a /etc/ldap.conf
+            # File '/etc/nsswitch.conf'
+            show_info 'File "nsswitch.conf"'
+            $SUDOCMD sed -i 's/compat/files ldap/' /etc/nsswitch.conf
+            echo -e "automount: files\n" | $SUDOCMD tee -a /etc/nsswitch.conf
+            # File '/etc/idmapd.conf'
+            show_info 'File "idmapd.conf"'
+            echo -e "Domain = INTRANET\nLocal-Realms = epfl@INTRANET,epfl,epfl.ch\n" | $SUDOCMD tee -a /etc/idmapd.conf
+            # File '/etc/nslcd.conf'
+            show_info 'Configure nscd daemon'
+            echo -e "bind_timelimit 30\ntimelimit 30\nidle_timelimit 1200" | $SUDOCMD tee -a /etc/nslcd.conf
+            $SUDOCMD service nscd restart
+            # Enabling login from other users
+            show_info 'Enabling login from other users'
+            echo -e "[SeatDefaults]\ngreeter-show-manual-login=true\ngreeter-hide-users=true" | $SUDOCMD tee /etc/lightdm/lightdm.conf
+            # Done with LDAP
+            show_success 'Done with LDAP.'
 
-    # Setup autofs
-    show_info 'Setting up automount & autofs ...'
-    if [ ! -d "/etc/auto.master.d" ]; then
-        mkdir -p /etc/auto.master.d
-    fi
-    echo "/home /etc/auto.home --timeout 3600" | $SUDOCMD tee -a /etc/auto.master.d/home.autofs
-    echo "/- /etc/auto.cosmo --timeout 3600" | $SUDOCMD tee -a /etc/auto.master.d/cosmo.autofs
-    # Check if the line including the auto.master.d directory is present; otherwise, append
-    if grep -E "^#\+dir.*" /etc/auto.master; then
-        $SUDOCMD sed -i -e 's/^#\(+dir.*\)/\1/' /etc/auto.master
-    else
-        echo "+dir:/etc/auto.master.d" | $SUDOCMD tee -a /etc/auto.master
-    fi
-    # There is an error if the rule '+auto.master' is present
-    if grep "^+auto.master"; then
-        sed -i -e 's/^\(+auto.*\)/#\1/' /etc/auto.master
-    fi
-    # Creating map files
-    show_info 'Creating map files for home folders and COSMO workspaces'
-    echo "/apps -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-apps" | $SUDOCMD tee /etc/auto.cosmo
-    echo "* -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/cosmo-homes/&" | $SUDOCMD tee /etc/auto.home
-    #echo "* -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-homes/&" | $SUDOCMD tee /etc/auto.home
-    echo "/workspace -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/workspace" | $SUDOCMD tee -a /etc/auto.cosmo
-    #echo "/workspace -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/workspace" | $SUDOCMD tee -a /etc/auto.cosmo
-    show_success 'Done. AutoFS will start on next reboot.'
-    
-    # Permissions on scratch and local home
-    show_info 'Changing permissions to local scratch folder and home'
-    if [[ -d "/local/scratch" ]]; then
-        $SUDOCMD chgrp COSMO-unit /local/scratch
-        $SUDOCMD chmod -R 775 /local/scratch
-    fi
-    if [[ -d "/local/home" ]]; then
-        $SUDOCMD chgrp COSMO-unit /local/home
-    fi
-    show_success 'Configuration done.'
-    whiptail --title "Finished" --msgbox "Configuration complete." 8 78
-    configure
+            # Setup autofs
+            show_info 'Setting up automount & autofs ...'
+            if [ ! -d "/etc/auto.master.d" ]; then
+                mkdir -p /etc/auto.master.d
+            fi
+            echo "/home /etc/auto.home --timeout 3600" | $SUDOCMD tee -a /etc/auto.master.d/home.autofs
+            echo "/- /etc/auto.cosmo --timeout 3600" | $SUDOCMD tee -a /etc/auto.master.d/cosmo.autofs
+            # Check if the line including the auto.master.d directory is present; otherwise, append
+            if grep -E "^#\+dir.*" /etc/auto.master; then
+                $SUDOCMD sed -i -e 's/^#\(+dir.*\)/\1/' /etc/auto.master
+            else
+                echo "+dir:/etc/auto.master.d" | $SUDOCMD tee -a /etc/auto.master
+            fi
+            # There is an error if the rule '+auto.master' is present
+            if grep "^+auto.master"; then
+                show_info "Commenting out '+auto.master' otherwise will cause problems"
+                sed -i -e 's/^\(+auto.*\)/#\1/' /etc/auto.master
+            fi
+            # Creating map files
+            show_info 'Creating map files for home folders and COSMO workspaces'
+            echo "/apps -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-apps" | $SUDOCMD tee /etc/auto.cosmo
+            echo "* -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/cosmo-homes/&" | $SUDOCMD tee /etc/auto.home
+            #echo "* -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-homes/&" | $SUDOCMD tee /etc/auto.home
+            echo "/workspace -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/workspace" | $SUDOCMD tee -a /etc/auto.cosmo
+            #echo "/workspace -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/workspace" | $SUDOCMD tee -a /etc/auto.cosmo
+            show_success 'Done. AutoFS will start on next reboot.'
+            # Permissions on scratch and local home
+            show_info 'Changing permissions to local scratch folder and home'
+            if [[ -d "/local/scratch" ]]; then
+                $SUDOCMD chgrp COSMO-unit /local/scratch
+                $SUDOCMD chmod -R 775 /local/scratch
+            fi
+            if [[ -d "/local/home" ]]; then
+                $SUDOCMD chgrp COSMO-unit /local/home
+            fi
+            show_success 'Configuration done.'
+            whiptail --title "Finished" --msgbox "Configuration complete." 8 78
+            configure
     else
         clear && main
     fi

@@ -1,0 +1,16 @@
+autofs
+udev
+libpam-ldapd
+libpam-ccreds
+libnss-ldapd
+nss-updatedb
+libnss-db
+nscd
+nslcd
+ldap-utils
+ntp
+nfs-common
+autofs-ldap
+libpam-krb5
+krb5-user
+nfs4-acl-tools

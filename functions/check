@@ -9,7 +9,8 @@ function check {
     # Now checking sudo privileges
     show_info "Checking if user can run command as superuser..."
     check_sudo
-    
+    show_info "Checking which distribution is running..."
+    check_release
     # Checking main dependecies
     show_info "Checking dependencies..."
     for package in $(cat $DEPS)
@@ -67,5 +68,26 @@ function check_sudo {
         show_success "You are root, no problems. Going on..."
         SUDOCMD=
         sleep 2
+    fi
+}
+
+function check_release {
+    # This script is meant to work with Ubuntu-based OS, but should be easy to work smoothly also with Debian (a possible future candidate for COSMO workstations)
+    EXITSTATUS=$(which lsb_release &>/dev/null; echo $?)
+    if [[ $EXITSTATUS != 0 ]]; then
+        show_error "It seems there's no 'lsb_release' command to check for the distribution! Aborting."
+        sleep 2 && exit 99
+    else
+        RELEASE=$(lsb_release -ds | awk '{print $1}')
+        case $RELEASE in
+            "Ubuntu")
+                show_info "Running Ubuntu or Ubuntu-based distribution, OK ..."; sleep 2
+                ;;
+            "Debian")
+                show_info "Running Debian, using different packages' list and configs ..."; sleep 2
+                ;;
+            *)
+                show_warning "Distribution not recognized! You might encounter problems running this script. Aborting."; sleep 2 && exit 99
+        esac
     fi
 }
