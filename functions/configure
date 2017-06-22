@@ -90,13 +90,13 @@ function cosmonas {
             if [ ! -d "/etc/auto.master.d" ]; then
                 mkdir -p /etc/auto.master.d
             fi
-            echo "/home /etc/auto.home --timeout 3600" | $SUDOCMD tee -a /etc/auto.master.d/home.autofs
-            echo "/- /etc/auto.cosmo --timeout 3600" | $SUDOCMD tee -a /etc/auto.master.d/cosmo.autofs
+            echo -e "/home /etc/auto.home --timeout 3600\n" | $SUDOCMD tee -a /etc/auto.master.d/home.autofs
+            echo -e "/- /etc/auto.cosmo --timeout 3600\n" | $SUDOCMD tee -a /etc/auto.master.d/cosmo.autofs
             # Check if the line including the auto.master.d directory is present; otherwise, append
             if grep -E "^#\+dir.*" /etc/auto.master; then
                 $SUDOCMD sed -i -e 's/^#\(+dir.*\)/\1/' /etc/auto.master
             else
-                echo "+dir:/etc/auto.master.d" | $SUDOCMD tee -a /etc/auto.master
+                echo -e "+dir:/etc/auto.master.d\n" | $SUDOCMD tee -a /etc/auto.master
             fi
             # There is an error if the rule '+auto.master' is present
             if grep "^+auto.master"; then
