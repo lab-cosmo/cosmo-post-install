@@ -81,7 +81,6 @@ function check_release {
         RELEASE=$(lsb_release -ds | awk '{print $1}')
         case $RELEASE in
             "Ubuntu")
-                UFLAG=true
                 show_warning "Running Ubuntu or Ubuntu-based distribution, OK ..."; sleep 2
                 ;;
             "Debian")
