@@ -99,7 +99,7 @@ function cosmonas {
                 echo -e "+dir:/etc/auto.master.d\n" | $SUDOCMD tee -a /etc/auto.master
             fi
             # There is an error if the rule '+auto.master' is present
-            if grep "^+auto.master"; then
+            if grep "^+auto.master" /etc/auto.master; then
                 show_info "Commenting out '+auto.master' otherwise will cause problems"
                 sed -i -e 's/^\(+auto.*\)/#\1/' /etc/auto.master
             fi
