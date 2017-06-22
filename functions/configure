@@ -1,13 +1,7 @@
 #!/bin/bash
 
 dir="$(dirname "$0")"
-#if [[ "$RELEASE" == "Ubuntu" ]]; then
-#    show_info "Using Ubuntu list of packages"
-#    COSMOUTILS="$dir/data/cosmonas.list"
-#else
-#    show_info "Using Debian list of packages"
-#    COSMOUTILS="$dir/data/cosmonas-debian.list"
-#fi
+COSMOUTILS="$dir/data/cosmonas.list"
 
 # Preferred settings
 function preferences {
@@ -51,21 +45,20 @@ function apport {
 
 # Setup shared home on the COSMO nas
 function cosmonas {
-    if (eval `resize` && whiptail --title \
+    if (eval "$(resize)" && whiptail --title \
         "Setup of remote HOMES and LDAP authentication" --yesno \
         #"List of applications needed for this operation: \n\n$(cat $COSMOUTILS) \n\nProceed?" \
         "Some applications might need to be installed, based on the OS\n\nProceed?" \
-        $LINES $COLUMNS $(( $LINES - 12 )) \
+        $LINES $COLUMNS $(($LINES - 12)) \
         --scrolltext ) then
             # First, check if running Ubuntu or Debian
-            if [[ "$RELEASE" == "Ubuntu" ]]; then
-                COSMOUTILS="$dir/data/cosmonas.list"
-            else
-                COSMOUTILS="$dir/data/cosmonas-debian.list"
+            if [[ "$RELEASE" == "Debian" ]]; then
+                COSMOUTILS="${COSMOUTILS%%.list}-debian.list"
             fi
             show_info 'Installing... This will trigger an interactive setup of LDAP and Kerberos.'
             show_warning 'Requires root privileges'
             $SUDOCMD apt-get install -y --no-install-recommends $(cat $COSMOUTILS)
+            check_exit "$?"
             show_success 'Installation done.'
             show_info 'Setting up LDAP auth files...'
             show_warning 'Requires root privileges'
