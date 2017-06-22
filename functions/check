@@ -82,13 +82,13 @@ function check_release {
         case $RELEASE in
             "Ubuntu")
                 UFLAG=true
-                show_info "Running Ubuntu or Ubuntu-based distribution, OK ..."; sleep 2
+                show_warning "Running Ubuntu or Ubuntu-based distribution, OK ..."; sleep 2
                 ;;
             "Debian")
-                show_info "Running Debian, using different packages' list and configs ..."; sleep 2
+                show_warning "Running Debian, using different packages' list and configs ..."; sleep 2
                 ;;
             *)
-                show_warning "Distribution not recognized! You might encounter problems running this script. Aborting."; sleep 2 && exit 99
+                show_error "Distribution not recognized! You might encounter problems running this script. Aborting."; sleep 2 && exit 99
         esac
     fi
 }
