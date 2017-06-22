@@ -15,6 +15,7 @@ function install_utils {
         show_warning 'Requires root privileges'
         # Feel free to change the contents of 'utilities.list' in the data folder to whatever suits your preference.
         $SUDOCMD apt-get install -y --no-install-recommends $(cat $UTILS)
+        check_exit "$?"
         # Done
         show_success 'Done.'
         whiptail --title "Finished" --msgbox "Installation complete." 8 78
