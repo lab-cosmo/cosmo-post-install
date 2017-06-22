@@ -1,9 +1,11 @@
 #!/bin/bash
 
 dir="$(dirname "$0")"
-if [[ "$RELEASE" -eq "Ubuntu" ]]; then
+if [[ "$RELEASE" == "Ubuntu" ]]; then
+    show_info "Using Ubuntu list of packages"
     COSMOUTILS="$dir/data/cosmonas.list"
 else
+    show_info "Using Debian list of packages"
     COSMOUTILS="$dir/data/cosmonas-debian.list"
 fi
 
