@@ -45,10 +45,9 @@ function apport {
 
 # Setup shared home on the COSMO nas
 function cosmonas {
-    if (eval "$(resize)" && whiptail --title \
-        "Setup of remote HOMES and LDAP authentication" --yesno \
-        #"List of applications needed for this operation: \n\n$(cat $COSMOUTILS) \n\nProceed?" \
-        "Some applications might need to be installed, based on the OS\n\nProceed?" \
+    if (eval "$(resize)" && whiptail \
+        --title "Setup of remote HOMES and LDAP authentication" \
+        --yesno "List of applications needed for this operation: \n\n$(cat $COSMOUTILS) \n\nProceed?" \
         $LINES $COLUMNS $(($LINES - 12)) \
         --scrolltext ) then
             # First, check if running Ubuntu or Debian
@@ -86,7 +85,6 @@ function cosmonas {
             echo -e "[SeatDefaults]\ngreeter-show-manual-login=true\ngreeter-hide-users=true" | $SUDOCMD tee /etc/lightdm/lightdm.conf
             # Done with LDAP
             show_success 'Done with LDAP.'
-
             # Setup autofs
             show_info 'Setting up automount & autofs ...'
             if [ ! -d "/etc/auto.master.d" ]; then
