@@ -45,15 +45,15 @@ function apport {
 
 # Setup shared home on the COSMO nas
 function cosmonas {
+    # First, check if running Ubuntu or Debian
+    if [[ "$RELEASE" == "Debian" ]]; then
+        COSMOUTILS="${COSMOUTILS%%.list}-debian.list"
+    fi
     if (eval "$(resize)" && whiptail \
         --title "Setup of remote HOMES and LDAP authentication" \
         --yesno "List of applications needed for this operation: \n\n$(cat $COSMOUTILS) \n\nProceed?" \
         $LINES $COLUMNS $(($LINES - 12)) \
         --scrolltext ) then
-            # First, check if running Ubuntu or Debian
-            if [[ "$RELEASE" == "Debian" ]]; then
-                COSMOUTILS="${COSMOUTILS%%.list}-debian.list"
-            fi
             show_info 'Installing... This will trigger an interactive setup of LDAP and Kerberos.'
             show_warning 'Requires root privileges'
             $SUDOCMD apt-get install -y --no-install-recommends $(cat $COSMOUTILS)
