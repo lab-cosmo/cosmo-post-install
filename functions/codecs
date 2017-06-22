@@ -3,14 +3,18 @@
 # Install Ubuntu Restricted Extras
 function codecs {
 if (whiptail --title "Multimedia Codecs" --yesno "Install Ubuntu Restricted Extras for multimedia playback?" 10 60) then
-    # Install Ubuntu Restricted Extras
-    show_info 'Installing...'
-    show_warning 'Requires root privileges'
-    $SUDOCMD apt-get install -y ubuntu-restricted-extras; check_exit "$?"
-    # Done
-    show_success 'Done.'
-    whiptail --title "Finished" --msgbox "Installation complete." 8 78
-    main
+    if "$DFLAG"; then
+        show_warning "The OS is Debian, installing this package will likely broke your system. Aborting."; sleep 2 && exit 99
+    else
+        # Install Ubuntu Restricted Extras
+        show_info 'Installing...'
+        show_warning 'Requires root privileges'
+        $SUDOCMD apt-get install -y ubuntu-restricted-extras; check_exit "$?"
+        # Done
+        show_success 'Done.'
+        whiptail --title "Finished" --msgbox "Installation complete." 8 78
+        main
+    fi
 else
     clear && main
 fi
