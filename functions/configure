@@ -1,7 +1,11 @@
 #!/bin/bash
 
 dir="$(dirname "$0")"
-COSMOUTILS="$dir/data/cosmonas.list"
+if [[ "$RELEASE" -eq "Ubuntu" ]]; then
+    COSMOUTILS="$dir/data/cosmonas.list"
+else
+    COSMOUTILS="$dir/data/cosmonas-debian.list"
+fi
 
 # Preferred settings
 function preferences {
