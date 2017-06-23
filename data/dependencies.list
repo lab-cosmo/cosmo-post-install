@@ -1,3 +1,5 @@
 software-properties-common
 whiptail
 xterm
+curl
+wget
