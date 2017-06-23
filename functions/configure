@@ -99,8 +99,8 @@ function cosmonas {
             ###fi
             # There is an error if the rule '+auto.master' is present
             if grep "^+auto.master" /etc/auto.master; then
-                show_info "Commenting out '+auto.master' otherwise will cause problems"
-                sed -i -e 's/^\(+auto.*\)/#\1/' /etc/auto.master
+                show_warning "Commenting out '+auto.master' otherwise will cause problems"
+                $SUDOCMD sed -i -e 's/^\(+auto.*\)/#\1/' /etc/auto.master
             fi
             # Creating map files
             show_info 'Creating map files for home folders and COSMO workspaces'
