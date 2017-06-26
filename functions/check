@@ -78,16 +78,12 @@ function check_release {
         show_error "It seems there's no 'lsb_release' command to check for the distribution! Aborting."
         sleep 2 && exit 99
     else
-        RELEASE=$(lsb_release -ds | awk '{print $1}')
-        case $RELEASE in
-            "Ubuntu")
-                show_warning "Running Ubuntu or Ubuntu-based distribution, OK ..."; sleep 2
-                ;;
-            "Debian")
-                show_warning "Running Debian, using different packages' list and configs ..."; sleep 2
-                ;;
-            *)
-                show_error "Distribution not recognized! You might encounter problems running this script. Aborting."; sleep 2 && exit 99
-        esac
+        if lsb_release -ds | grep -qE '(Ubuntu|Mint)'; then
+            show_info "Running Ubuntu or Ubuntu-based distro. It's okay..." && sleep 2
+        elif lsb_release -ds | grep -q 'Debian'; then
+            show_warning "Running Debian: some tweak to config & packages is needed, but it's okay..." && sleep 2
+        else
+            show_error "You are running a distribution which is not natively compatible with this script! Might break the system. Aborting." && sleep 2 && exit 99
+        fi
     fi
 }
