@@ -1,7 +1,6 @@
 autotools-dev
 bzr
 cmake
-git
 build-essential
 libssl-dev
 libz-dev
