@@ -88,15 +88,8 @@ function cosmonas {
             # Setup autofs
             show_info 'Setting up automount & autofs ...'
             mkdir -p /etc/auto.master.d
-            echo -e "/home /etc/auto.home --timeout 3600\n" | $SUDOCMD tee -a /etc/auto.master.d/home.autofs
-            echo -e "/- /etc/auto.cosmo --timeout 3600\n" | $SUDOCMD tee -a /etc/auto.master.d/cosmo.autofs
-	    # DIRECTORY auto.master.d IS ALWAYS PRESENT IN UBUNTU (SEEMS)
-            #### Check if the line including the auto.master.d directory is present; otherwise, append
-	    ###if grep -qE "\+dir" /etc/auto.master && grep -qE "^#\+dir.*" /etc/auto.master; then
-            ###   $SUDOCMD sed -i -e 's/^#\(+dir.*\)/\1/' /etc/auto.master
-            ###else
-            ###    echo -e "+dir:/etc/auto.master.d\n" | $SUDOCMD tee -a /etc/auto.master
-            ###fi
+            echo -e "/home /etc/auto.home --timeout 3600\n" | $SUDOCMD tee -a /etc/auto.master
+            echo -e "/- /etc/auto.cosmo --timeout 3600\n" | $SUDOCMD tee -a /etc/auto.master
             # There is an error if the rule '+auto.master' is present
             if grep "^+auto.master" /etc/auto.master; then
                 show_warning "Commenting out '+auto.master' otherwise will cause problems"
