@@ -13,8 +13,10 @@ You can get the latest version:
 
 **Remember:** the script has to be run after the OS installation by the user "local" created during installation (because many parts need root permissions).
 
-##Usage:
+## Usage
 
 Run from source folder:
 
-    ./cosmo-post-install-script.sh
+```
+./cosmo-post-install-script.sh
+```
