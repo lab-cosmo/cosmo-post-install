@@ -6,10 +6,11 @@ function slack {
 	# Download Debian file that matches system architecture
 	case `uname -i` in
 	    i386|i486|i586|i686)
-	        curl -O https://slack-ssb-updates.global.ssl.fastly.net/linux_releases/slack-desktop-2.0.0-i386.deb
+	        #curl -O https://slack-ssb-updates.global.ssl.fastly.net/linux_releases/slack-desktop-2.0.0-i386.deb
+		show_error "I don't know if Slack currently support non-64bit architectures." && thirdparty
 	        ;;
 	    x86_64)
-	        curl -O https://slack-ssb-updates.global.ssl.fastly.net/linux_releases/slack-desktop-2.0.0-amd64.deb
+	        curl -O https://downloads.slack-edge.com/linux_releases/slack-desktop-2.8.0-amd64.deb
 	        ;;
 	    *)
 	        show_error "No packages available to download that matches your system." && thirdparty
