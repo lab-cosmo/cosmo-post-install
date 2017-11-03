@@ -11,7 +11,6 @@ You can get the latest version:
 
     git clone https://github.com/edoardob90/cosmo-post-install.git
 
-**Remember:** the script has to be run after the OS installation by the user "local" created during installation (because many parts need root permissions).
 
 ## Usage
 
@@ -20,3 +19,23 @@ Run from source folder:
 ```
 ./cosmo-post-install-script.sh
 ```
+
+**Remember:** the script has to be run after the OS installation by the user "local" created during installation (because many parts need root permissions).
+
+## LDAP interactive configuration
+
+To configure shared homes & use the central NAS, choose “System configuration” in the main menu of the configuration script; then choose “Setup remote HOMES and LDAP authentication”.
+During installation of required packages, an interactive setup will be prompted. The settings are the following:
+
+1. **Kerberos realm**
+
+Default realm: INTRANET.EPFL.CH (*careful to the uppercase*)
+
+2. **LDAP configuration**
+
+- LDAP server: `ldap://ldap.epfl.ch/`
+- Distinguished names: `o=epfl,c=ch`
+- LDAP version: 3
+- LDAP auth configuration: answer **no** to the following two questions
+
+Everything else is managed by the script.
