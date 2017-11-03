@@ -29,13 +29,13 @@ During installation of required packages, an interactive setup will be prompted.
 
 1. **Kerberos realm**
 
-Default realm: INTRANET.EPFL.CH (*careful to the uppercase*)
+    Default realm: `INTRANET.EPFL.CH` (*careful to the uppercase*)
 
 2. **LDAP configuration**
 
-- LDAP server: `ldap://ldap.epfl.ch/`
-- Distinguished names: `o=epfl,c=ch`
-- LDAP version: 3
-- LDAP auth configuration: answer **no** to the following two questions
+    - LDAP server: `ldap://ldap.epfl.ch/`
+    - Distinguished names: `o=epfl,c=ch`
+    - LDAP version: 3
+    - LDAP auth configuration: answer **no** to the following two questions
 
 Everything else is managed by the script.
