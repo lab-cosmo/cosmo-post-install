@@ -10,7 +10,7 @@ function slack {
 		show_error "I don't know if Slack currently support non-64bit architectures." && thirdparty
 	        ;;
 	    x86_64)
-	        curl -O https://downloads.slack-edge.com/linux_releases/slack-desktop-2.8.0-amd64.deb
+	        curl -O https://downloads.slack-edge.com/linux_releases/slack-desktop-3.0.5-amd64.deb
 	        ;;
 	    *)
 	        show_error "No packages available to download that matches your system." && thirdparty
