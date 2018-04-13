@@ -106,12 +106,13 @@ function cosmonas {
             # Permissions on scratch and local home
             show_info 'Changing permissions to local scratch folder and home'
             if [[ -d "/local/scratch" ]]; then
-                $SUDOCMD chgrp COSMO-unit /local/scratch
-                $SUDOCMD chmod -R 775 /local/scratch
+                $SUDOCMD chgrp -R COSMO-unit /local/scratch
+                $SUDOCMD chmod -R 1777 /local/scratch # 1777 octal means: rwx for everyone PLUS sticky bit
             fi
-            if [[ -d "/local/home" ]]; then
-                $SUDOCMD chgrp COSMO-unit /local/home
-            fi
+            # Why local home should be accessed by everyone?
+            #if [[ -d "/local/home" ]]; then
+            #    $SUDOCMD chgrp COSMO-unit /local/home
+            #fi
             show_success 'Configuration done.'
             whiptail --title "Finished" --msgbox "Configuration complete." 8 78
             configure

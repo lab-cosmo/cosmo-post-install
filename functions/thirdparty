@@ -17,6 +17,8 @@ source $dir/functions/third-party/spotify
 source $dir/functions/third-party/steam
 source $dir/functions/third-party/sublime-text3
 source $dir/functions/third-party/vocal
+source $dir/functions/third-party/insync
+
 
 # Install Third-Party Applications
 function thirdparty {
@@ -28,20 +30,13 @@ function thirdparty {
         --ok-button "Install" \
         --cancel-button "Go Back" \
         $LINES $COLUMNS $(( $LINES - 12 )) \
-        'birdie'            'Birdie Twitter client' \
+        'insync'            'Insync GDrive client' \
         'dropbox'           'Dropbox' \
-        'gnome'             'GNOME desktop' \
         'google-chrome'     'Google Chrome' \
-        'keybase'           'Keybase' \
         'fontforge'         'FontForge' \
-        'minecraft'         'Minecraft' \
-        'oracle-java'       'Oracle Java 8' \
-        'owncloud'          'ownCloud client' \
         'rvm'               'Ruby Version Manager (RVM)' \
         'slack'             'Slack' \
         'spotify'           'Spotify' \
-        'steam'             'Steam' \
-        'sublime-text3'     'Sublime Text 3' \
         'vocal'             'Vocal podcast app' \
         3>&1 1>&2 2>&3)
      
