@@ -10,7 +10,16 @@ function slack {
 		show_error "I don't know if Slack currently support non-64bit architectures." && thirdparty
 	        ;;
 	    x86_64)
-	        curl -O https://downloads.slack-edge.com/linux_releases/slack-desktop-3.0.5-amd64.deb
+            # From Ubuntu 16.04, we can use snap
+            if [[ $(lsb_release -ds | cut -d' ' -f2 | cut -d'.' -f1) -ge '16' ]]; then
+                show_info "Ubuntu version supports installing through Snap..."
+                SNAP=0
+            else
+                SNAP=1
+                show_info "Downloading from Slack repository..."
+                show_warning "This could be an outdated version, but Slack should deal with the automatic update on the first start."
+                curl -O https://downloads.slack-edge.com/linux_releases/slack-desktop-3.0.5-amd64.deb
+            fi
 	        ;;
 	    *)
 	        show_error "No packages available to download that matches your system." && thirdparty
@@ -19,10 +28,14 @@ function slack {
 	# Install package(s)
 	show_info 'Installing Slack...'
 	show_warning 'Requires root privileges'
-	sudo dpkg -i slack-desktop-*.deb
-	sudo apt-get install -fy
-	# Cleanup and finish
-	rm slack-desktop-*.deb
+    if test $SNAP; then
+        $SUDOCMD snap install --classic slack # --classic because Slack app doens't support yet the sandboxing of Snap
+    else
+	    $SUDOCMD dpkg -i slack-desktop-*.deb
+	    $SUDOCMD apt-get install -fy
+	    # Cleanup and finish
+	    rm slack-desktop-*.deb
+    fi
     # Done
     show_success 'Done.'
     whiptail --title "Finished" --msgbox "Installation complete." 8 78
