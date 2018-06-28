@@ -186,6 +186,13 @@ function install_snap_package() {
 			echo_message info "Installing snap package '${2}'..."
 			# Admin privileges
 			superuser_do "snap install ${2}"
+            if [[ $? != 0 ]]; then
+                echo_message error "Failed to install ${2}. Second attempt disabling snap app security confinement..."
+                superuser_do "snap install --classic ${2}"
+                if [[ $? != 0 ]]; then
+                    echo_message error "Second attempt to install ${2} failed. Skipping :-("
+                fi
+            fi
 			# Finished
 			echo_message success "Installation of '${2}' is complete."
 			whiptail --title "Finished" --msgbox "Installation of ${1} is complete." 8 56
