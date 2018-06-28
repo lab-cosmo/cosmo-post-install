@@ -2,15 +2,10 @@
 # -*- Mode: sh; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 #
 # Authors:
-#   Sam Hewitt <hewittsamuel@gmail.com>
-#
-# Modified by:
-#    Edoardo Baldi <edoardob90@gmail.com>
-#    (to adapt to COSMO post-install setup)
+#   Sam Hewitt <sam@snwh.org>
 #
 # Description:
 #   A post-installation bash script for Ubuntu
-#   with a few modifications for setting up a COSMO workstation
 #
 # Legal Preamble:
 #
@@ -30,80 +25,83 @@
 tabs 4
 clear
 
-#----- Import Functions -----#
-
-dir="$(dirname "$0")"
-
-. $dir/functions/check
-. $dir/functions/cleanup
-. $dir/functions/codecs
-. $dir/functions/configure
-. $dir/functions/development
-. $dir/functions/favourites
-. $dir/functions/thirdparty
-. $dir/functions/update
-. $dir/functions/utilities
-
-#----- Fancy Messages -----#
-show_error(){
-echo -e "\033[1;31m$@\033[m" 1>&2
-}
-show_info(){
-echo -e "\033[1;32m$@\033[0m"
-}
-show_warning(){
-echo -e "\033[1;33m$@\033[0m"
-}
-show_question(){
-echo -e "\033[1;34m$@\033[0m"
-}
-show_success(){
-echo -e "\033[1;35m$@\033[0m"
-}
-show_header(){
-echo -e "\033[1;36m$@\033[0m"
-}
-show_listitem(){
-echo -e "\033[0;37m$@\033[0m"
-}
+# Title of script set
+TITLE="COSMO Post-Install Script"
 
 # Main
 function main {
-    eval `resize`
-    MAIN=$(whiptail \
-        --notags \
-        --title "COSMO Ubuntu Post-Install Script" \
-        --menu "\nWhat would you like to do?" \
-        --cancel-button "Quit" \
-        $LINES $COLUMNS $(( $LINES - 12 )) \
-        update      'Perform system update' \
-        favourites  'Install default COSMO applications' \
-        utilities   'Install default COSMO system utilities' \
-        development 'Install development tools' \
-        codecs      'Install Ubuntu Restricted Extras' \
-        thirdparty  'Install third-party applications' \
-        configure   'Configure system (including remote HOMES and LDAP authentication)' \
-        cleanup     'Cleanup the system' \
-        3>&1 1>&2 2>&3)
-     
-    exitstatus=$?
-    if [ $exitstatus = 0 ]; then
-        clear && $MAIN
-    else
-        clear && quit
-    fi
+	echo_message header "Starting 'main' function"
+	# Draw window
+	MAIN=$(eval `resize` && whiptail \
+		--notags \
+		--title "$TITLE" \
+		--menu "\nWhat would you like to do?" \
+		--cancel-button "Quit" \
+		$LINES $COLUMNS $(( $LINES - 12 )) \
+		'system_update'         'Perform system updates' \
+		'install_favs'          'Install preferred applications' \
+		'install_favs_dev'      'Install preferred development tools' \
+		'install_favs_utils'    'Install preferred utilities' \
+		'install_gnome'         'Install preferred GNOME software' \
+		'install_codecs'        'Install multimedia codecs' \
+		'install_fonts'         'Install additional fonts' \
+		'install_snap_apps'     'Install Snap applications' \
+		'install_thirdparty'    'Install third-party applications' \
+		'setup_dotfiles'        'Configure dotfiles' \
+		'system_configure'      'Configure system' \
+		'system_cleanup'        'Cleanup the system' \
+		3>&1 1>&2 2>&3)
+	# check exit status
+	if [ $? = 0 ]; then
+		echo_message header "Starting '$MAIN' function"
+		$MAIN
+	else
+		# Quit
+		quit
+	fi
 }
 
 # Quit
 function quit {
-    if (whiptail --title "Quit" --yesno "Are you sure you want quit?" 10 60) then
-        exit 99
-    else
-        clear && main
-    fi
+	echo_message header "Starting 'quit' function"
+	echo_message title "Exiting $TITLE..."
+	# Draw window
+	if (whiptail --title "Quit" --yesno "Are you sure you want quit?" 8 56) then
+		echo_message welcome 'Thanks for using!'
+		exit 99
+	else
+		main
+	fi
 }
 
-#RUN
-check && main
+# Import Functions
+function import_functions {
+	DIR="functions"
+	# iterate through the files in the 'functions' folder
+	for FUNCTION in $(dirname "$0")/$DIR/*; do
+		# skip directories
+		if [[ -d $FUNCTION ]]; then
+			continue
+		# exclude markdown readmes
+		elif [[ $FUNCTION == *.md ]]; then
+			continue
+		elif [[ -f $FUNCTION ]]; then
+			# source the function file
+			. $FUNCTION
+		fi
+	done
+}
+
+# Import main functions
+import_functions
+# Welcome message
+echo_message welcome "$TITLE"
+# Run system checks
+system_checks
+# main
+while :
+do
+	main
+done
 
 #END OF SCRIPT

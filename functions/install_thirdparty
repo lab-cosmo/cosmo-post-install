@@ -30,6 +30,7 @@ function install_thirdparty {
 		--ok-button "Install" \
 		--cancel-button "Go Back" \
 		$LINES $COLUMNS $(( $LINES - 12 )) \
+        'install_insync'        'Insync Client' \
 		'install_chrome'        'Google Chrome' \
 		'install_dropbox'       'Dropbox' \
 		'install_oracle_java'   'Oracle Java' \

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Insync
+function install_insync {
+    NAME="Insync"
+    # Save GPG key for repository
+    superuser_do apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ACCAF35C
+    # Add Insync repository first
+    echo_message info "Adding $NAME repository for current release"
+    CODENAME=$(lsb_release -cs)
+    DISTRO=$(lsb_release -ds | tr '[:upper:]' '[:lower:]' | cut -d' ' -f1)
+    echo "deb http://apt.insynchq.com/$DISTRO $CODENAME non-free contrib" | superuser_do 'tee /etc/apt/sources.list.d/insync.list'
+    echo_message info "Installing $NAME"
+    superuser_do 'apt-get update'
+    install_package $NAME "insync" install_thirdparty
+}

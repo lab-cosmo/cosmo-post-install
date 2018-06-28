@@ -53,6 +53,71 @@ function hide_snap_folder {
 	fi
 }
 
+# Configure the remote home directories on the central NAS
+function install_nas_packages {
+    # Installing needed apps for this action
+    install_from_list "packages for remote homes & central authentication" "cosmonas" "system_configure"
+}
+
+function setup_nas_homes {
+    # The actual setup
+    echo_message info 'Setting up LDAP auth files...'
+    echo_message warning 'Requires root privileges'
+    # File '/etc/ntp.conf'
+    echo_message info 'File "ntp.conf"'
+    echo "server 128.178.23.1" | superuser_do 'tee -a /etc/ntp.conf'
+    # File '/etc/ldap.conf'
+    echo_message info 'Configuring file "ldap.conf"'
+    echo -e "timelimit 30\nbind_timelimit 30\nidle_timelimit 1200\nbind_policy soft\n nss_initgroups backlink\nnss_map_attribute uniqueMember memberUid\n" | superuser_do tee -a /etc/ldap.conf
+    IGNORE=`awk -F: '{printf ("%s,",$1)}' /etc/passwd`
+    echo "nss_initgroups_ignoreusers ${IGNORE%,}" | superuser_do 'tee -a /etc/ldap.conf'
+    # File '/etc/nsswitch.conf'
+    echo_message info 'File "nsswitch.conf"'
+    superuser_do 'sed -i "s/compat/files ldap/" /etc/nsswitch.conf'
+    echo -e "automount: files\n" | superuser_do 'tee -a /etc/nsswitch.conf'
+    # File '/etc/idmapd.conf'
+    echo_message info 'File "idmapd.conf"'
+    echo -e "Domain = INTRANET\nLocal-Realms = epfl@INTRANET,epfl,epfl.ch\n" | superuser_do 'tee -a /etc/idmapd.conf'
+    # File '/etc/nslcd.conf'
+    echo_message info 'Configure nscd daemon'
+    echo -e "bind_timelimit 30\ntimelimit 30\nidle_timelimit 1200" | superuser_do 'tee -a /etc/nslcd.conf'
+    superuser_do service nscd restart
+    # Enabling login from other users
+    echo_message info 'Enabling login from other users'
+    echo -e "[SeatDefaults]\ngreeter-show-manual-login=true\ngreeter-hide-users=true" | superuser_do 'tee /etc/lightdm/lightdm.conf'
+    # Done with LDAP
+    echo_message success 'Done with LDAP.'
+    # Setup autofs
+    echo_message info 'Setting up automount & autofs ...'
+    mkdir -p /etc/auto.master.d
+    echo -e "/home /etc/auto.home --timeout 3600\n" | superuser_do 'tee -a /etc/auto.master'
+    echo -e "/- /etc/auto.cosmo --timeout 3600\n" | superuser_do 'tee -a /etc/auto.master'
+    # There is an error if the rule '+auto.master' is present
+    if grep "^+auto.master" /etc/auto.master; then
+        echo_message warning "Commenting out '+auto.master' otherwise will cause problems"
+        superuser_do 'sed -i -e "s/^\(+auto.*\)/#\1/" /etc/auto.master'
+    fi
+    # Creating map files
+    echo_message info 'Creating map files for home folders and COSMO workspaces'
+    echo "/apps -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-apps" | superuser_do 'tee /etc/auto.cosmo'
+    echo "* -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/cosmo-homes/&" | superuser_do 'tee /etc/auto.home'
+    echo "/workspace -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/workspace" | superuser_do 'tee -a /etc/auto.cosmo'
+    echo_message success 'Done. AutoFS will start on next reboot.'
+    # Permissions on scratch and local home
+    echo_message info 'Changing permissions to local scratch folder and home'
+    if [[ -d "/local/scratch" ]]; then
+        superuser_do 'chgrp -R COSMO-unit /local/scratch'
+        # 1777 octal means: rwx for everyone PLUS sticky bit
+        superuser_do 'chmod -R 1777 /local/scratch'
+    fi
+    # Why local home should be accessed by everyone?
+    #if [[ -d "/local/home" ]]; then
+    #    superuser_do chgrp COSMO-unit /local/home
+    #fi
+    echo_message success 'Configuration done.'
+}
+
+
 # Configure System
 function system_configure {
 	NAME="System Configuration"
@@ -64,6 +129,8 @@ function system_configure {
 		--menu "\nWhat would you like to do?" \
 		--cancel-button "Go Back" \
 		$LINES $COLUMNS $(( $LINES - 12 )) \
+        'install_nas_packages'      '(1) Install required packages for remote homes & central authentication' \
+        'setup_nas_homes'           '(2) Setup remote homes' \
 		'disable_crash_dialogs'     'Disable error report dialogs (apport)' \
 		'gsettings_config'          'Set preferred application & desktop settings' \
 		'hide_snap_folder'          'Hide the snap folder in user home' \
