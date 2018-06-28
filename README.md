@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 COSMO Post Install Script
 ==========================
 
@@ -9,42 +8,36 @@ Before that date, the two releases will coexist. If you are installing Ubuntu 18
 
 ---
 
-This project provides a set of shell scripts to be run after a fresh install of an Ubuntu(-based) OS. It will install your favourite applications, set your preferred settings, etc.
+A semi-automatic and interactive set of post-installation scripts for Ubuntu and its derivatives. You can use this project to install your favourite apps, set your preferred settings, and do minor housekeeping.
 
-The scripts have been modified to setup all the things needed to have a working COSMO workstation. It is just a guided version of the manual procedure described in the document "Deployment of a new COSMO machine".
+This project is free software; you can redistribute it and/or modify it under the terms of the [GNU General Public License](/LICENSE). If you have improvements, contributions to the [original](https://github.com/snwh/ubuntu-post-install) are much appreciated.
 
-Feel free to copy, improve and distribute.
+The scripts have been modified to setup all the things needed to have a working [COSMO](https://cosmo.epfl.ch) workstation. It is just a guided version of the manual procedure described in the document "Deployment of a new COSMO machine".
+
+
+### Usage
 
 You can get the latest version:
 
     git clone https://github.com/edoardob90/cosmo-post-install.git
 
-
-## Usage
-=======
-Ubuntu Post Install Scripts
-===========================
-
-A semi-automatic and interactive set of post-installation scripts for Ubuntu and its derivatives. You can use this project to install your favourite apps, set your preferred settings, and do minor housekeeping.
-
-This project is free software; you can redistribute it and/or modify it under the terms of the [GNU General Public License](/LICENSE). If you have improvements, contributions to the [original](https://github.com/snwh/ubuntu-post-install) are much appreciated.
-
-## Organization
-
-This project is designed to be fairly modular (and not be one huge script) so you can easily delete or exclude bits/functions that you don't want to use.
-
- * [`data`](/data): files which are lists of packages<sup>&dagger;</sup> read by various functions.
- * [`functions`](/functions): the main functions of this scriptset. They should require little user-preference modification.
- * [`apps`](/functions/apps): functions for installing third-party applications. They are called in the [`install_thirdparty`](/functions/install_thirdparty) function.
->>>>>>> upstream/master
-
-*<sup>&dagger;</sup>These lists are preferential and you should to update them with packages you prefer*
+and then run the script with:
 
 ```
 ./cosmo-post-install-script.sh
 ```
 
 **Remember:** the script has to be run after the OS installation by the user "local" created during installation (because many parts need root permissions).
+
+
+### Organization
+
+This project is designed to be fairly modular (and not be one huge script) so you can easily delete or exclude bits/functions that you don't want to use.
+
+ * [`data`](/data): files which are lists of packages<sup>&dagger;</sup> read by various functions.
+ * [`functions`](/functions): the main functions of this scriptset. They should require little user-preference modification.
+ * [`apps`](/functions/apps): functions for installing third-party applications. They are called in the [`install_thirdparty`](/functions/install_thirdparty) function.
+
 
 ## LDAP interactive configuration
 
