@@ -1,6 +1,13 @@
 COSMO Post Install Script
 ==========================
 
+### Important note
+
+Since from July the 1st (tentative) Ubuntu **16.04** will be officially offered a migration to the next LTS release (**18.04**), a new branch is progressively been updated to reflect packages' changes & related stuff.
+Before that date, the two releases will coexist. If you are installing Ubuntu 18.04 from scratch, please change to the `1804LTS` branch before running the script.
+
+---
+
 This project provides a set of shell scripts to be run after a fresh install of an Ubuntu(-based) OS. It will install your favourite applications, set your preferred settings, etc.
 
 The scripts have been modified to setup all the things needed to have a working COSMO workstation. It is just a guided version of the manual procedure described in the document "Deployment of a new COSMO machine".
