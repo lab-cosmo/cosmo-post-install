@@ -3,8 +3,18 @@ COSMO Post Install Script
 
 ### Important notes
 
-1. Since from July the 1st (tentative) Ubuntu **16.04** will be officially offered a migration to the next LTS release (**18.04**), a new branch is progressively been updated to reflect packages' changes & related stuff.
-Before that date, the two releases will coexist. If you are installing Ubuntu 18.04 from scratch, please change to the `1804LTS` branch before running the script.
+1. Until the end of July ([tentative](https://wiki.ubuntu.com/BionicBeaver/ReleaseSchedule)) Ubuntu **16.04** won't be officially offered a migration to the next LTS release (**18.04**). A new temporary branch (`1804LTS`) is progressively been updated to reflect packages' changes & related stuff until the two releases coexist.
+If you are setting up a new machine with Ubuntu 18.04 installed from scratch, please **be aware** that some apps could not be installed (yet the new version of the script will handle those few cases).
+
+Packages that are known to **not** be available in Ubuntu **18.04** (mostly in [`data/favs-dev`](/data/favs-devs.list)):
+
+Ubuntu 16.04 | Ubuntu 18.04
+------------ | ------------
+`libpng12-dev` |`libpng-dev`
+`libgd2-dev` | `libgd-dev`
+`liblua5.1-dev` | `liblua5.2-dev`
+
+You **are free to modify by hand** the `data/*.list` file(s) to reflect these changes, until the temporary branch is merged when the official upgrade will be offered.
 
 2. The script has been **globally reformatted**, following the updates of the [original project](https://github.com/snwh/ubuntu-post-install). Now the script is now much more flexible and it is much easier to add new features.
 
