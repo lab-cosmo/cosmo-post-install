@@ -6,7 +6,7 @@ COSMO Post Install Script
 1. Until the end of July ([tentative](https://wiki.ubuntu.com/BionicBeaver/ReleaseSchedule)) Ubuntu **16.04** won't be officially offered a migration to the next LTS release (**18.04**). A new temporary branch (`1804LTS`) is progressively been updated to reflect packages' changes & related stuff until the two releases coexist.
 If you are setting up a new machine with Ubuntu 18.04 installed from scratch, please **be aware** that some apps could not be installed (yet the new version of the script will handle those few cases).
 
-Packages that are known to **not** be available in Ubuntu **18.04** (mostly in [`data/favs-dev`](/data/favs-devs.list)):
+Packages that are known to **not** be available in Ubuntu **18.04** (mostly in [`data/favs-dev`](/data/favs-dev.list)):
 
 Ubuntu 16.04 | Ubuntu 18.04
 ------------ | ------------
