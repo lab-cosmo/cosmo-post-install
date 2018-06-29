@@ -41,15 +41,16 @@ This project is designed to be fairly modular (and not be one huge script) so yo
 
 ## LDAP interactive configuration
 
-### WARNING
+### !!! WARNING
 
 Before going through the configuration of shared HOMES and LDAP authentication, you **must** be sure to use the correct DNS servers. You can check them with following command
 
 ```
 nmcli dev show | grep DNS
 ```
-You could have 2 or 3 servers. Check that these servers are either `127.178.15.[227-229]` or `127.178.15.[7-8]`. If you are not using these servers, than be aware that you could face problem with the Kerberos authentication setup by the script. _Forewarned is forearmed..._
+You could have 2 or 3 servers. Check that these servers are either `127.178.15.[227-229]` or `127.178.15.[7-8]`. If you are not using these servers, than be aware that you could face problems with the Kerberos authentication procedure set up by the script. _Forewarned is forearmed..._
 
+---
 
 To configure shared homes & use the central NAS, choose “System configuration” in the main menu of the configuration script; then choose “Setup remote HOMES and LDAP authentication”.
 During installation of required packages, an interactive setup will be prompted (**twice**, it's not an error). The settings are the following:
