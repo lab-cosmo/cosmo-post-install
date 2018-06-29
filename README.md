@@ -1,10 +1,12 @@
 COSMO Post Install Script
 ==========================
 
-### Important note
+### Important notes
 
-Since from July the 1st (tentative) Ubuntu **16.04** will be officially offered a migration to the next LTS release (**18.04**), a new branch is progressively been updated to reflect packages' changes & related stuff.
+1. Since from July the 1st (tentative) Ubuntu **16.04** will be officially offered a migration to the next LTS release (**18.04**), a new branch is progressively been updated to reflect packages' changes & related stuff.
 Before that date, the two releases will coexist. If you are installing Ubuntu 18.04 from scratch, please change to the `1804LTS` branch before running the script.
+
+2. The script has been **globally reformatted**, following the updates of the [original project](https://github.com/snwh/ubuntu-post-install). Now the script is now much more flexible and it is much easier to add new features.
 
 ---
 
@@ -34,14 +36,14 @@ and then run the script with:
 
 This project is designed to be fairly modular (and not be one huge script) so you can easily delete or exclude bits/functions that you don't want to use.
 
- * [`data`](/data): files which are lists of packages<sup>&dagger;</sup> read by various functions.
+ * [`data`](/data): files which are lists of packages read by various functions.
  * [`functions`](/functions): the main functions of this scriptset. They should require little user-preference modification.
  * [`apps`](/functions/apps): functions for installing third-party applications. They are called in the [`install_thirdparty`](/functions/install_thirdparty) function.
 
 
 ## LDAP interactive configuration
 
-### !!! WARNING
+### !!! WARNING !!!
 
 Before going through the configuration of shared HOMES and LDAP authentication, you **must** be sure to use the correct DNS servers. You can check them with following command
 
@@ -73,5 +75,5 @@ Everything else is managed by the script.
 Adding additional functions is as easy as editing one of the many already included functions and simply changing the variables. When you do add (or remove) functions be sure to update any main function (such as [`thirdparty`](/functions/thirdparty)) to reflect those changes.
 
 ## TODO
-- [x] TeXLive installation (from official repository)
-- [ ] Automated installation of EPFL printers (printers' pool MyPrint)
+- [ ] TeXLive installation from official repository (needs to be included in the new script version).
+- [ ] Automated installation of EPFL printers (printers' pool MyPrint).
