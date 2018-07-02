@@ -54,7 +54,7 @@ function install_texlive {
                     echo_message error "Only i386 or x86_64 are officially supported by this script!" && main
                     ;;
             esac
-            superuser_do 'ln -fs $TEXPATH/bin /opt/texbin'
+            superuser_do "ln -fs $TEXPATH/bin /opt/texbin"
             echo_message warning 'TeX binaries directory set. You MUST logout/login to make this change effective.' && sleep 2
             echo_message info "Check that the command 'which tex' will give you '/opt/texbin'. If this is the case, enjoy TeXLive." && sleep 2
             echo_message info 'Making TeX aware of system fonts...'
