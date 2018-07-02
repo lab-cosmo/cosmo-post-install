@@ -4,8 +4,11 @@
 # Authors:
 #   Sam Hewitt <sam@snwh.org>
 #
+# Modified and extended by
+#   Edoardo Baldi <edoardo.baldi@epfl.ch>
+#
 # Description:
-#   A post-installation bash script for Ubuntu
+#   A post-installation bash script for Ubuntu-based COSMO workstations
 #
 # Legal Preamble:
 #
