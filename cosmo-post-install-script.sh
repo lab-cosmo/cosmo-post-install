@@ -47,6 +47,7 @@ function main {
 		'install_fonts'         'Install additional fonts' \
 		'install_snap_apps'     'Install Snap applications' \
 		'install_thirdparty'    'Install third-party applications' \
+        'install_texlive'       'Install latest TeXLive distribution (interactive)' \
 		'setup_dotfiles'        'Configure dotfiles' \
 		'system_configure'      'Configure system' \
 		'system_cleanup'        'Cleanup the system' \
@@ -87,7 +88,7 @@ function import_functions {
 			continue
 		elif [[ -f $FUNCTION ]]; then
 			# source the function file
-			. $FUNCTION
+			source $FUNCTION
 		fi
 	done
 }

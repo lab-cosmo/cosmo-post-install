@@ -164,7 +164,7 @@ function check_privileges {
 	if [[ $EUID != 0 ]]; then
 		if [[ $(groups $USER | grep -q 'sudo'; echo $?) != 0 ]]; then
 			echo_message error "This user account doesn't have admin privileges."
-			echo_message info "Log in as a user with admin privileges to be able to much of these scripts.."
+			echo_message info "Log in as a user with admin privileges to be able to perform much of these scripts' actions!"
 			echo_message info "Exiting..."
 			sleep 5 && exit 99
 		else

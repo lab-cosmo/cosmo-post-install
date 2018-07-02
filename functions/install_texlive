@@ -1,0 +1,76 @@
+#!/bin/bash
+
+function install_texlive {
+    if [[ $(check_package_installed "pdflatex") != 0 || $(check_package_installed "tex") != 0 ]]; then
+        if (whiptail \
+            --title "TeXLive installation" \
+            --yesno "This action will download & install the latest available version of TeXLive.\n\nProceed with installation?" 10 64) \
+        then
+            # Install
+            echo_message info "Preparing directories and dowloading TeX distribution..."
+            TMPDIR="/tmp/texlive-install"
+            mkdir -p $TMPDIR; cd $TMPDIR
+            # Checking if TeXLive has been already installed
+            if [[ ! -d "/usr/local/texlive" ]]; then
+                echo_message info "Downloading TeXLive installer..."
+                wget -O - http://mirror.switch.ch/ftp/mirror/tex/systems/texlive/tlnet/install-tl-unx.tar.gz | tar xzf -
+                cd install-tl-*
+                echo_message info "Starting TeXLive installer..."
+                echo_message info "Choose a different directory if you don't want a system-wide installation."
+                echo_message warning 'Requires root privileges'
+                superuser_do './install-tl -repository http://mirror.switch.ch/ftp/mirror/tex/systems/texlive/tlnet'
+                if [[ "$?" != 0 ]]; then
+                    echo_message error 'Something went wrong with TeXLive installation! Exit and reinstall again.'
+                    clear && main
+                else
+                    echo_message info 'TeXLive installation went fine! Now configuring binaries and paths ...'
+                fi
+            else
+                echo_message warning "Found a TeXLive path in /usr/local. Attempting to proceed with TeXLive configuration..."
+            fi
+            cd ${OLDPWD}
+            echo_message info 'Setting up path for TeX bins...'
+            echo 'export PATH=/opt/texbin:${PATH}' > texlive.sh
+            superuser_do mv texlive.sh /etc/profile.d/
+            superuser_do mkdir -p /opt
+            YEAR=$(whiptail --title "Year of TeXLive distribution installed?" --nocancel --inputbox "Year:\n" 8 80 "2015" 3>&1 1>&2 2>&3)
+            if [[ "$?" != 0 || ${#YEAR} > 4 ]]; then
+                echo_message error 'You specified a wrong year (perhaps badly formatted; only 4 digits are needed)'
+                clear && main
+            fi
+            INSTALLDIR=$(whiptail --title "Where did you install TeXLive?" --nocancel --inputbox "Install directory:\n(leave default if you installed in '/usr/local')" 8 80 "/usr/local" 3>&1 1>&2 2>&3)
+            if [[ "$?" != 0 ]]; then
+                echo_message error 'Something went wrong when specifying TeXLive installation path.' && sleep 2
+                clear && main
+            fi
+            case `uname -i` in
+                i386)
+                    TEXPATH="$INSTALLDIR/texlive/${YEAR}/bin/i386"
+                    ;;
+                x86_64)
+                    TEXPATH="$INSTALLDIR/texlive/${YEAR}/bin/x86_64-linux"
+                    ;;
+                *)
+                    echo_message error "Only i386 or x86_64 are officially supported by this script!" && main
+                    ;;
+            esac
+            superuser_do 'ln -fs $TEXPATH/bin /opt/texbin'
+            echo_message warning 'TeX binaries directory set. You MUST logout/login to make this change effective.' && sleep 2
+            echo_message info "Check that the command 'which tex' will give you '/opt/texbin'. If this is the case, enjoy TeXLive." && sleep 2
+            echo_message info 'Making TeX aware of system fonts...'
+            superuser_do cp "$(kpsewhich -var-value TEXMFSYSVAR)/fonts/conf/texlive-fontconfig.conf /etc/fonts/conf.d/09-texlive.conf"
+            superuser_do 'fc-cache -fsv'
+            rm -rf ${TMPDIR}
+            echo_message info 'Done.'
+            whiptail --title "Finished" --msgbox "TeXLive installation complete. Happy TeXing!" 8 78
+            main
+        else
+            clear && main
+        fi
+    else
+        # Something belonging to TeXLive is already installed
+        echo_message info "Something related to TeXLive seems already installed. Exiting to avoid potential software clashed..."
+		whiptail --title "Finished" --msgbox "Installation of ${1} is already complete." 8 56
+        clear && main
+    fi
+}
