@@ -61,7 +61,7 @@ function install_nas_packages {
 }
 
 function setup_nas_homes {
-    if [[ ${INSTALL_NAS_PACKAGE} == 'ok' ]]; then
+    if [[ ${NAS_CONFIGURATION} != 'ok' && ${INSTALL_NAS_PACKAGE} == 'ok' ]]; then
         # The actual setup
         echo_message info 'Setting up LDAP auth files...'
         echo_message warning 'Requires root privileges'
@@ -85,8 +85,10 @@ function setup_nas_homes {
         echo -e "bind_timelimit 30\ntimelimit 30\nidle_timelimit 1200" | superuser_do 'tee -a /etc/nslcd.conf'
         superuser_do service nscd restart
         # Enabling login from other users
-        echo_message info 'Enabling login from other users'
-        echo -e "[SeatDefaults]\ngreeter-show-manual-login=true\ngreeter-hide-users=true" | superuser_do 'tee /etc/lightdm/lightdm.conf'
+        if [[ "$LATEST_LTS" == 'no' ]]; then
+            echo_message info 'Enabling login from other users'
+            echo -e "[SeatDefaults]\ngreeter-show-manual-login=true\ngreeter-hide-users=true" | superuser_do 'tee /etc/lightdm/lightdm.conf'
+        fi
         # Done with LDAP
         echo_message success 'Done with LDAP.'
         # Setup autofs
@@ -95,22 +97,23 @@ function setup_nas_homes {
         echo -e "/home /etc/auto.home --timeout 3600\n" | superuser_do 'tee -a /etc/auto.master'
         echo -e "/- /etc/auto.cosmo --timeout 3600\n" | superuser_do 'tee -a /etc/auto.master'
         # There is an error if the rule '+auto.master' is present
-        if grep "^+auto.master" /etc/auto.master; then
-            echo_message warning "Commenting out '+auto.master' otherwise will cause problems"
-            superuser_do 'sed -i -e "s/^\(+auto.*\)/#\1/" /etc/auto.master'
+        if grep -q "^+auto.master" /etc/auto.master; then
+            echo_message warning "Commenting out '+auto.master' otherwise it will cause problems"
+            superuser_do 'sed -i -e "s/^\(+auto\.master\)/#\1/" /etc/auto.master'
         fi
         # Creating map files
         echo_message info 'Creating map files for home folders and COSMO workspaces'
         echo "/apps -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-apps" | superuser_do 'tee /etc/auto.cosmo'
         echo "* -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/cosmo-homes/&" | superuser_do 'tee /etc/auto.home'
         echo "/workspace -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/workspace" | superuser_do 'tee -a /etc/auto.cosmo'
-        echo_message success 'Done. AutoFS will start on next reboot.'
+        echo_message success 'Done. Restarting AutoFS...'
+        superuser_do 'service autofs restart'
         # Permissions on scratch and local home
         echo_message info 'Changing permissions to local scratch folder and home'
         if [[ ! -d "/local/scratch" ]]; then
             superuser_do 'mkdir -p /local/scratch'
         else
-            superuser_do 'chgrp -R COSMO-unit /local/scratch'
+            superuser_do 'chgrp -R cosmo /local/scratch'
             # 1777 octal means: rwx for everyone PLUS sticky bit
             superuser_do 'chmod -R 1777 /local/scratch'
         fi
@@ -119,9 +122,9 @@ function setup_nas_homes {
         #    superuser_do chgrp COSMO-unit /local/home
         #fi
         echo_message success 'Configuration done.'
+        NAS_CONFIGURATION='ok'
     else
-        #echo_message error "You must install necessary packages before running this setup!"
-		whiptail --title "ERROR" --msgbox "You must install necessary packages befor running this setup!" 8 56
+        whiptail --title "ERROR" --msgbox "Possible causes:\n (1) Did you install necessary packages?\n (2) Don't run twice this action!" 8 56
         system_configure
     fi
 }

@@ -85,6 +85,13 @@ function check_distribution {
 		if lsb_release -ds | grep -qE '(Ubuntu)'; then
 			echo 'Current distribution is: '$(lsb_release -ds)
 			echo_message success "You are using Ubuntu. :D"
+            # if using 18.04, something changes. Example: settings to LightDM are useless
+            if [[ $(lsb_release -rs) == '18.04' ]]; then
+                LATEST_LTS='yes'
+                echo_message warning "You are using the latest LTS. This is just a warning for possible debug, users should not worry"
+            else
+                LATEST_LTS='no'
+            fi
 			echo "Proceeding."
 		# if Mint or elementary
 		elif lsb_release -ds | grep -qE '(Mint|elementary)'; then
