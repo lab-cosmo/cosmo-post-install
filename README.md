@@ -82,7 +82,7 @@ Everything else is managed by the script.
 
 ## Adding Functions
 
-Adding additional functions is as easy as editing one of the many already included functions and simply changing the variables. When you do add (or remove) functions be sure to update any main function (such as [`thirdparty`](/functions/thirdparty)) to reflect those changes.
+Adding additional functions is as easy as editing one of the many already included functions and simply changing the variables. When you do add (or remove) functions be sure to update any main function (such as [`install_thirdparty`](/functions/install_thirdparty)) to reflect those changes.
 
 ## TODO
 - [ ] TeXLive installation from official repository (needs to be included in the new script version).
