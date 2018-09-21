@@ -130,6 +130,48 @@ function setup_nas_homes {
 }
 
 
+# Install & configure EPFL MyPrint's printers (printer's pools for color & BW)
+function setup_epfl_myprint {
+    # Check to see if the drivers are installed
+    if [[ ! -e /usr/share/cups/model/PPD*.ppd ]]
+    then
+        superuser_do mkdir -p /usr/share/cups/model
+        superuser_do cp $(dirname "$0")'/data/epfl-printer-drivers'/*ppd /usr/share/cups/model/
+    fi
+
+    # Check to see if the printer is already installed
+    if ! $(lpstat -p 2>&1 | grep -qE 'MyPrint*')
+    then
+        # Make sure the printer is available before trying to install it (check the printer web page)
+        if [ `curl -s http://192.168.1.9/main/main.html | grep -c 'Brother HL-4570CDW' || true` = "0" ]
+        then
+            echo_message error "Printer cannot be found!"
+            exit 1
+        fi
+        echo_message info "Installing MyPrint BW"
+        lpadmin \
+            -p 'Brother-HL-4570CDW' \
+            -v 'socket://192.168.1.9' \
+            -m 'HL-4570CDW series CUPS' \
+            -P '/usr/share/ppd/brhl4570cdw.ppd' \
+            -L 'Basement Utility Room' \
+            -o 'Two-Sided Printing=DuplexNoTumble' \
+            -o 'Color=Mono' \
+            -o 'Enhance Black Printing=ON' \
+            -o 'Skip Blank Page=ON' \
+            -E
+        ## Set it as the default printer
+        #lpadmin -d 'Brother-HL-4570CDW'
+        #echo "Setting up CUPS default print options"
+        #sudo sed -ir 's/DefaultBRDuplex.*/DefaultBRDuplex: DuplexNoTumble/g;  
+        #              s/DefaultBRMonoColor.*/DefaultBRMonoColor: mono/g;
+        #              s/DefaultBREnhanceBlkPrt.*/DefaultBREnhanceBlkPrt: ON/g;
+        #              s/DefaultBRSkipBlank.*/DefaultBRSkipBlank: ON/g;' /etc/cups/ppd/Brother-HL-4570CDW.ppd
+    fi
+
+}
+
+
 # Configure System
 function system_configure {
 	NAME="System Configuration"
@@ -143,6 +185,7 @@ function system_configure {
 		$LINES $COLUMNS $(( $LINES - 12 )) \
         'install_nas_packages'      '(1) Install required packages for remote homes & central authentication' \
         'setup_nas_homes'           '(2) Setup remote homes' \
+        'setup_epfl_myprint'        'Install & configure EPFL MyPrint printers' \
 		'disable_crash_dialogs'     'Disable error report dialogs (apport)' \
 		'gsettings_config'          'Set preferred application & desktop settings' \
 		'hide_snap_folder'          'Hide the snap folder in user home' \
