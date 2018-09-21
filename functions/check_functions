@@ -93,8 +93,8 @@ function check_distribution {
                 LATEST_LTS='no'
             fi
 			echo "Proceeding."
-		# if Mint or elementary
-		elif lsb_release -ds | grep -qE '(Mint|elementary)'; then
+            # if Mint or elementary or Pop!_OS (from System76, Ubuntu LTS-based)
+		elif lsb_release -ds | grep -qE '(Mint|elementary|Pop)'; then
 			echo 'Current distribution is: '$(lsb_release -ds)
 			echo_message success "You are using an Ubuntu-based distribution. It's probably fine. :)"
 			echo "Proceeding."
