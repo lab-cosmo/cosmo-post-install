@@ -131,6 +131,12 @@ function setup_nas_homes {
 
 
 # Install & configure EPFL MyPrint's printers (printer's pools for color & BW)
+function setup_epfl_myprint_dummy {
+    # This does nothing. Fallback while implementing this stuff.
+    whiptail --title "INFO" --msgbox "This function is going to be implemented soon!" 8 56
+    system_configure
+}
+
 function setup_epfl_myprint {
     # Check to see if the drivers are installed
     if [[ ! -e /usr/share/cups/model/PPD*.ppd ]]
@@ -185,7 +191,7 @@ function system_configure {
 		$LINES $COLUMNS $(( $LINES - 12 )) \
         'install_nas_packages'      '(1) Install required packages for remote homes & central authentication' \
         'setup_nas_homes'           '(2) Setup remote homes' \
-        'setup_epfl_myprint'        'Install & configure EPFL MyPrint printers' \
+        'setup_epfl_myprint_dummy'        'Install & configure EPFL MyPrint printers' \
 		'disable_crash_dialogs'     'Disable error report dialogs (apport)' \
 		'gsettings_config'          'Set preferred application & desktop settings' \
 		'hide_snap_folder'          'Hide the snap folder in user home' \
