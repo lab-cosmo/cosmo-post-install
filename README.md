@@ -5,11 +5,10 @@ COSMO Post Install Script
 
 #### Ubuntu 'bionic' (18.04 LTS)
 
-This branch is the most up-to-date regarding packages renamed/changed/removed in Ubuntu 18.04. If you are fresh-installing it, please **clone & checkout** `updating` branch. When ready, all the small adjustments here will be merged in `master`.
+This branch is the most up-to-date regarding packages renamed/changed/removed in Ubuntu 18.04.
+It can be safely run on the latest Ubuntu LTS, but some errors may arise if using with an older version of Ubuntu.
 
-~~If you are setting up a new machine with Ubuntu 18.04 installed from scratch, please **be aware** that some apps could not be installed (yet the new version of the script will handle those few cases).~~
-
-You **are free to modify by hand** the `data/*.list` file(s) to reflect these changes, until the temporary branch is merged when the official upgrade will be offered.
+The script supports to several Ubuntu-based distributions, in particular the compatibility has been tested with: [**Linux Mint**](https://linuxmint.com/), [**elementary OS**](https://elementary.io), **Pop!\_OS** by [System76](https://system76.com/pop).
 
 #### Script reformat
 
