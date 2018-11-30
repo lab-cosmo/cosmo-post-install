@@ -83,7 +83,7 @@ function check_distribution {
 	else
 		# if Ubuntu
 		if lsb_release -ds | grep -qE '(Ubuntu)'; then
-			echo 'Current distribution is: '$(lsb_release -ds)
+			echo_message info "Current distribution is: $(lsb_release -ds)"
 			echo_message success "You are using Ubuntu. :D"
             # if using 18.04, something changes. Example: settings to LightDM are useless
             if [[ $(lsb_release -rs) == '18.04' ]]; then
@@ -92,17 +92,16 @@ function check_distribution {
             else
                 LATEST_LTS='no'
             fi
-			echo "Proceeding."
             # if Mint or elementary or Pop!_OS (from System76, Ubuntu LTS-based)
 		elif lsb_release -ds | grep -qE '(Mint|elementary|Pop)'; then
-			echo 'Current distribution is: '$(lsb_release -ds)
+			echo_message info 'Current distribution is: '$(lsb_release -ds)
 			echo_message success "You are using an Ubuntu-based distribution. It's probably fine. :)"
-			echo "Proceeding."
+			echo_message info "Proceeding."
 		# if Debian
 		elif lsb_release -ds | grep -q 'Debian'; then
-			echo 'Current distribution is: '$(lsb_release -ds)
+			echo_message info 'Current distribution is: '$(lsb_release -ds)
 			echo_message warning "You are using Debian. This is not recommended. Some functions may not work. :/"
-			echo "Proceeding nonetheless."
+			echo_message info "Proceeding nonetheless."
 		# if anything else
 		else
 			echo_message warning "You are using a distribution that may not be compatible with this script set."
