@@ -120,18 +120,22 @@ function setup_nas_homes {
         
         # Permissions on scratch and local home
         echo_message info 'Changing permissions to local scratch folder and home'
-        if [[ ! -d "/local/scratch" ]]; then
-            superuser_do 'mkdir -p /local/scratch'
+        if [[ "$CPUGEN" != "xeon" ]]; then
+            if [[ ! -d "/local/scratch" ]]; then
+                superuser_do 'mkdir -p /local/scratch'
+            else
+                superuser_do 'chgrp -R cosmo /local/scratch'
+                # 1777 octal means: rwx for everyone PLUS sticky bit
+                superuser_do 'chmod -R 1777 /local/scratch'
+            fi
+            # Local home directory
+            if [[ ! -d "/local/home/local" ]]; then
+                superuser_do 'mkdir -p /local/home/local'
+            else
+                superuser_do 'sed -i -e "s|^\(local.*:\)/home/local\(:.*\)|\1/local/home/local\2|" /etc/passwd'
+            fi
         else
-            superuser_do 'chgrp -R cosmo /local/scratch'
-            # 1777 octal means: rwx for everyone PLUS sticky bit
-            superuser_do 'chmod -R 1777 /local/scratch'
-        fi
-        # Local home directory
-        if [[ ! -d "/local/home/local" ]]; then
-            superuser_do 'mkdir -p /local/home/local'
-        else
-            superuser_do 'sed -i -e "s|^\(local.*:\)/home/local\(:.*\)|\1/local/home/local\2|" /etc/passwd'
+            echo_message info "This is a Intel Xeon machine. Scratch will be on the second HD, no need to have a separate /local/scratch folder"
         fi
         echo_message success 'Configuration done.'
         NAS_CONFIGURATION='ok'

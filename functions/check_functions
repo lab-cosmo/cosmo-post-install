@@ -208,8 +208,23 @@ function check_privileges {
 	fi
 }
 
+# Check current hardware: there are some tweaks that change if using 3rd gen workstations
+function check_hardware {
+    echo_message header "Starting 'check_hardware' function"
+    echo_message info "Checking workstation generation, based on CPU"
+    if cat /proc/cpuinfo | grep -qE '(i7|i5)'; then
+        CPUGEN="i7"
+        echo_message info "This machine has an Intel i5/7 CPU (1st or 2nd gen.)"
+    else
+        CPUGEN="xeon"
+        echo_message info "This machine has an Intel Xeon CPU (3rd or 4th gen.)"
+    fi
+}
+
 # Run system checks
 function system_checks {
+    # Check CPU
+    check_hardware
 	# Check OS
 	check_os
 	# Check distribution

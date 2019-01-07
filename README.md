@@ -66,7 +66,7 @@ During installation of required packages, an interactive setup will be prompted 
 
 1. **Kerberos realm**
 
-    Default realm: `INTRANET.EPFL.CH` (*careful to the uppercase*)
+Default realm: `INTRANET.EPFL.CH` (*careful to the uppercase*)
 
 2. **LDAP configuration**
 
@@ -74,6 +74,7 @@ During installation of required packages, an interactive setup will be prompted 
     - Distinguished names: `o=epfl,c=ch`
     - LDAP version: 3
     - LDAP auth configuration: answer **no** to the following two questions
+    - LDAP services: **tick** the following three services: `groups`, `passwd`, `shadow`
 
 Everything else is managed by the script.
 
