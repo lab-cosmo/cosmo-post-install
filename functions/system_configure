@@ -61,7 +61,7 @@ function install_nas_packages {
 }
 
 function setup_nas_homes {
-    if [[ ${NAS_CONFIGURATION} != 'ok' && ${INSTALL_NAS_PACKAGE} == 'ok' ]]; then
+    if [[ ${INSTALL_NAS_PACKAGE} == 'ok' && ${NAS_CONFIGURATION} != 'ok' ]]; then
         
         # The actual setup
         echo_message info 'Setting up LDAP auth files...'
@@ -73,13 +73,14 @@ function setup_nas_homes {
         
         # File '/etc/ldap.conf'
         echo_message info 'Configuring file "ldap.conf"'
-        echo -e "timelimit 30\nbind_timelimit 30\nidle_timelimit 1200\nbind_policy soft\n nss_initgroups backlink\nnss_map_attribute uniqueMember memberUid\n" | superuser_do tee -a /etc/ldap.conf
+        echo -e "timelimit 30\nbind_timelimit 30\nidle_timelimit 1200\nbind_policy soft\nnss_initgroups backlink\nnss_map_attribute uniqueMember memberUid\n" | superuser_do tee -a /etc/ldap.conf
         IGNORE=$(awk -F: '{printf ("%s,",$1)}' /etc/passwd)
         echo "nss_initgroups_ignoreusers ${IGNORE%,}" | superuser_do 'tee -a /etc/ldap.conf'
         
         # File '/etc/nsswitch.conf'
         echo_message info 'File "nsswitch.conf"'
-        superuser_do 'sed -i "s/compat/files ldap/" /etc/nsswitch.conf'
+        # The following is: (1) unnecessary, (2) possibily wrong
+        #superuser_do 'sed -i "s/compat/files ldap/" /etc/nsswitch.conf'
         echo -e "automount: files\n" | superuser_do 'tee -a /etc/nsswitch.conf'
         
         # File '/etc/idmapd.conf'
@@ -89,7 +90,11 @@ function setup_nas_homes {
         # File '/etc/nslcd.conf'
         echo_message info 'Configure nscd daemon'
         echo -e "bind_timelimit 30\ntimelimit 30\nidle_timelimit 1200" | superuser_do 'tee -a /etc/nslcd.conf'
-        superuser_do service nscd restart
+        if [[ "$LATEST_LTS" == 'yes' ]]; then
+            superuser_do 'systemctl nslcd.service restart'
+        else
+            superuser_do 'service nscd restart'
+        fi
         
         # Enabling login from other users
         if [[ "$LATEST_LTS" == 'no' ]]; then
@@ -106,17 +111,21 @@ function setup_nas_homes {
         echo -e "/home /etc/auto.home --timeout 3600\n" | superuser_do 'tee -a /etc/auto.master'
         echo -e "/- /etc/auto.cosmo --timeout 3600\n" | superuser_do 'tee -a /etc/auto.master'
         
-        # There is an error if the rule '+auto.master' is present
-        echo_message warning "Commenting out '+auto.master' otherwise it will cause problems"
-        superuser_do 'sed -i -e "s/^\(+auto\.master\)/#\1/" /etc/auto.master'
+        # There is an error if the rule '+auto.master' is present. NOT SURE IF STILL NEEDED.
+        #echo_message warning "Commenting out '+auto.master' otherwise it will cause problems"
+        #superuser_do 'sed -i -e "s:^\(+auto\.master\):#\1:g" /etc/auto.master'
         
         # Creating map files
         echo_message info 'Creating map files for home folders and COSMO workspaces'
-        echo "/apps -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-apps" | superuser_do 'tee /etc/auto.cosmo'
-        echo "* -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/cosmo-homes/&" | superuser_do 'tee /etc/auto.home'
-        echo "/workspace -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/workspace" | superuser_do 'tee -a /etc/auto.cosmo'
+        echo '/apps -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-apps' | superuser_do 'tee /etc/auto.cosmo'
+        echo '* -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/cosmo-homes/&' | superuser_do 'tee /etc/auto.home'
+        echo '/workspace -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/workspace' | superuser_do 'tee -a /etc/auto.cosmo'
         echo_message success 'Done. Restarting AutoFS...'
-        superuser_do 'service autofs restart'
+        if [[ "$LATEST_LTS" == 'yes' ]]; then
+            superuser_do 'systemctl restart autofs.service'
+        else
+            superuser_do 'service autofs restart'
+        fi
         
         # Permissions on scratch and local home
         echo_message info 'Changing permissions to local scratch folder and home'
@@ -134,8 +143,13 @@ function setup_nas_homes {
             else
                 superuser_do 'sed -i -e "s|^\(local.*:\)/home/local\(:.*\)|\1/local/home/local\2|" /etc/passwd'
             fi
+            echo_message warning 'Remember to move /home/local/* to /local/home/local'
         else
-            echo_message info "This is a Intel Xeon machine. Scratch will be on the second HD, no need to have a separate /local/scratch folder"
+            if [[ ! -d "/ssd" ]]; then
+                superuser_do 'mkdir -p /ssd/scratch /ssd/home/local'
+            fi
+            superuser_do 'sed -i -e "s|^\(local.*:\)/home/local\(:.*\)|\1/ssd/home/local\2|" /etc/passwd'
+            echo_message warning 'Remember to move /home/local/* to /ssd/home/local'
         fi
         echo_message success 'Configuration done.'
         NAS_CONFIGURATION='ok'
