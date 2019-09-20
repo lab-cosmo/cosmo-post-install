@@ -50,6 +50,7 @@ This project is designed to be fairly modular (and not be one huge script) so yo
 
 ## LDAP interactive configuration
 
+0. **Preparation** 
 ### !!! WARNING !!!
 
 Before going through the configuration of shared HOMES and LDAP authentication, you **must** be sure to use the correct DNS servers. You can check them with following command
@@ -64,19 +65,24 @@ You could have 2 or 3 servers. Check that these servers are either `127.178.15.[
 To configure shared homes & use the central NAS, choose “System configuration” in the main menu of the configuration script; then choose “Setup remote HOMES and LDAP authentication”.
 During installation of required packages, an interactive setup will be prompted (**twice**, it's not an error). The settings are the following:
 
-1. **Kerberos realm**
+1. **Configure System**
+If you decided to use Ubuntu minimal installation please install the packages xterm and curl before using the script. Then use in the script `Configure System`, then `(1) Install required packages for remote homes & central authentication`
 
-Default realm: `INTRANET.EPFL.CH` (*careful to the uppercase*)
-
-2. **LDAP configuration**
-
+*LDAP configuration*
     - LDAP server: `ldap://ldap.epfl.ch/`
     - Distinguished names: `o=epfl,c=ch`
     - LDAP version: 3
     - LDAP auth configuration: answer **no** to the following two questions
-    - LDAP services: **tick** the following three services: `groups`, `passwd`, `shadow`
+    - you will be asked again for the same first 2 options, just repeat the instructions above
+    - LDAP services: tick with **whitespace** the following three services: `passwd`, `groups`, `shadow`
 
-Everything else is managed by the script.
+*Kerberos realm*
+Default realm: `INTRANET.EPFL.CH` (*careful to the uppercase*)
+
+The installation should be finished and you should be back in the scripts menu, now choose `(2) Setup remote homes`. 
+
+2. **Installation of packages for work**
+You can use to script to install common packages, you are not required and can install them by yourself. However it is recommended to install at least `development tools` and `utilities`. For installing the printer, please use the official instruction of EPFL.
 
 ## Adding Functions
 
