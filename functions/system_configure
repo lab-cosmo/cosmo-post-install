@@ -132,6 +132,9 @@ function setup_nas_homes {
         if [[ "$CPUGEN" != "xeon" ]]; then
             if [[ ! -d "/local/scratch" ]]; then
                 superuser_do 'mkdir -p /local/scratch'
+                superuser_do 'chgrp -R cosmo /local/scratch'
+                # 1777 octal means: rwx for everyone PLUS sticky bit
+                superuser_do 'chmod -R 1777 /local/scratch'
             else
                 superuser_do 'chgrp -R cosmo /local/scratch'
                 # 1777 octal means: rwx for everyone PLUS sticky bit
@@ -140,6 +143,8 @@ function setup_nas_homes {
             # Local home directory
             if [[ ! -d "/local/home/local" ]]; then
                 superuser_do 'mkdir -p /local/home/local'
+                superuser_do 'chown -R local:local /local/home/local'
+                superuser_do 'sed -i -e "s|^\(local.*:\)/home/local\(:.*\)|\1/local/home/local\2|" /etc/passwd'
             else
                 superuser_do 'sed -i -e "s|^\(local.*:\)/home/local\(:.*\)|\1/local/home/local\2|" /etc/passwd'
             fi
@@ -151,6 +156,7 @@ function setup_nas_homes {
             superuser_do 'sed -i -e "s|^\(local.*:\)/home/local\(:.*\)|\1/ssd/home/local\2|" /etc/passwd'
             echo_message warning 'Remember to move /home/local/* to /ssd/home/local'
         fi
+            echo_message warning 'Remember to change /home/local/ to /local/home/local in the /etc/passwd'
         echo_message success 'Configuration done.'
         NAS_CONFIGURATION='ok'
     else
