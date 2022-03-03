@@ -69,12 +69,13 @@ During installation of required packages, an interactive setup will be prompted 
 If you decided to use Ubuntu minimal installation please install the packages xterm and curl before using the script. Then use in the script `Configure System`, then `(1) Install required packages for remote homes & central authentication`
 
 *LDAP configuration*
-    - LDAP server: `ldap://ldap.epfl.ch/`
-    - Distinguished names: `o=epfl,c=ch`
-    - LDAP version: 3
-    - LDAP auth configuration: answer **no** to the following two questions
-    - you will be asked again for the same first 2 options, just repeat the instructions above
-    - LDAP services: tick with **whitespace** the following three services: `passwd`, `groups`, `shadow`
+
+- LDAP server: `ldap://ldap.epfl.ch/`
+- Distinguished names: `o=epfl,c=ch`
+- LDAP version: 3
+- LDAP auth configuration: answer **no** to the following two questions
+- you will be asked again for the same first 2 options, just repeat the instructions above
+- LDAP services: tick with **whitespace** the following three services: `passwd`, `groups`, `shadow`
 
 *Kerberos realm*
 Default realm: `INTRANET.EPFL.CH` (*careful to the uppercase*)
@@ -82,6 +83,7 @@ Default realm: `INTRANET.EPFL.CH` (*careful to the uppercase*)
 The installation should be finished and you should be back in the scripts menu, now choose `(2) Setup remote homes`. 
 
 2. **Installation of packages for work**
+
 You can use to script to install common packages, you are not required and can install them by yourself. However it is recommended to install at least `development tools` and `utilities`. For installing the printer, please use the official instruction of EPFL.
 
 ## Adding Functions
@@ -89,5 +91,6 @@ You can use to script to install common packages, you are not required and can i
 Adding additional functions is as easy as editing one of the many already included functions and simply changing the variables. When you do add (or remove) functions be sure to update any main function (such as [`install_thirdparty`](/functions/install_thirdparty)) to reflect those changes.
 
 ## TODO
+
 - [x] TeXLive installation from official repository (needs to be included in the new script version).
 - [ ] Automated installation of EPFL printers (printers' pool MyPrint).
