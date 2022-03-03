@@ -75,7 +75,7 @@ If you decided to use Ubuntu minimal installation please install the packages xt
 - LDAP version: 3
 - LDAP auth configuration: answer **no** to the following two questions
 - you will be asked again for the same first 2 options, just repeat the instructions above
-- LDAP services: tick with **whitespace** the following three services: `passwd`, `groups`, `shadow`
+- LDAP services: tick with **space** key the following three services: `passwd`, `groups`, `shadow`, and validate with **enter**
 
 *Kerberos realm*
 Default realm: `INTRANET.EPFL.CH` (*careful to the uppercase*)
