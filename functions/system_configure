@@ -107,19 +107,18 @@ function setup_nas_homes {
         
         # Setup autofs
         echo_message info 'Setting up automount & autofs ...'
-        superuser_do 'mkdir -p /etc/auto.master.d'
-        echo -e "/home /etc/auto.home --timeout 3600\n" | superuser_do 'tee -a /etc/auto.master'
-        echo -e "/- /etc/auto.cosmo --timeout 3600\n" | superuser_do 'tee -a /etc/auto.master'
+        echo -e "# Include map file for COSMO services\n" | superuser_do 'tee -a /etc/auto.master'
+        echo -e "/net /etc/auto.cosmo --timeout 30\n" | superuser_do 'tee -a /etc/auto.master'
         
         # There is an error if the rule '+auto.master' is present. NOT SURE IF STILL NEEDED.
         #echo_message warning "Commenting out '+auto.master' otherwise it will cause problems"
         #superuser_do 'sed -i -e "s:^\(+auto\.master\):#\1:g" /etc/auto.master'
         
         # Creating map files
-        echo_message info 'Creating map files for home folders and COSMO workspaces'
-        echo '/apps -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-apps' | superuser_do 'tee /etc/auto.cosmo'
-        echo '* -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/cosmo-homes/&' | superuser_do 'tee /etc/auto.home'
-        echo '/workspace -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/workspace' | superuser_do 'tee -a /etc/auto.cosmo'
+        echo_message info 'Creating map files for COSMO workspaces'
+        echo 'opts="-fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp"' | superuser_do 'tee /etc/auto.cosmo'
+        echo -e 'work $opts sti2files.epfl.ch:/sti_cosmo_1_files_nfs/cosmo-homes' | superuser_do 'tee /etc/auto.cosmo'
+        echo -e 'cosmosrv $opts cosmosrv1.epfl.ch:/home' | superuser_do 'tee /etc/auto.cosmo'
         echo_message success 'Done. Restarting AutoFS...'
         if [[ "$LATEST_LTS" == 'yes' ]]; then
             superuser_do 'systemctl restart autofs.service'
